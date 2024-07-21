@@ -1,18 +1,20 @@
 package com.passer.passwatch.screen
 
-sealed class Screen(val route: String) {
-    data object MainMenuScreen : Screen("main_menu_screen")
-    data object NewRideScreen : Screen("new_ride_screen")
-    data object RidesScreen : Screen("rides_screen")
-    data object MapScreen : Screen("map_screen")
-    data object SettingsScreen : Screen("settings_screen")
+import kotlinx.serialization.Serializable
 
-    fun withArgs(vararg args: String): String {
-        return buildString {
-            append(route)
-            args.forEach { arg ->
-                append("/$arg")
-            }
-        }
-    }
-}
+
+@Serializable
+data object MainMenuScreen
+
+@Serializable
+data object NewRideScreen
+
+@Serializable
+data object RidesScreen
+
+@Serializable
+data object MapScreen
+
+@Serializable
+data object SettingsScreen
+

@@ -15,7 +15,6 @@ import androidx.navigation.NavController
 
 @Composable
 fun MainScreen(navController: NavController) {
-
     Column(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
@@ -25,7 +24,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(Screen.NewRideScreen.withArgs())
+                navController.navigate(NewRideScreen)
             }
         ) {
             Text(text = "New Ride")
@@ -35,7 +34,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(Screen.RidesScreen.withArgs())
+                navController.navigate(RidesScreen)
             }
         ) {
             Text(text = "Rides")
@@ -45,7 +44,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(Screen.MapScreen.withArgs())
+                navController.navigate(MapScreen)
             }
         ) {
             Text(text = "Map")
@@ -55,7 +54,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(Screen.SettingsScreen.withArgs())
+                navController.navigate(SettingsScreen)
             }
         ) {
             Text(text = "Settings")

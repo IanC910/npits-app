@@ -4,13 +4,19 @@ import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.room.Room
 import com.passer.passwatch.data.UserPreferencesRepository
 import com.passer.passwatch.screen.MainMenuScreen
 import com.passer.passwatch.screen.MainScreen
@@ -31,6 +37,24 @@ val MAC_KEY = stringPreferencesKey("hub_mac_address")
 
 class MainActivity : ComponentActivity() {
     lateinit var userRepo: UserPreferencesRepository
+    private val db by lazy {
+        Room.databaseBuilder(
+            applicationContext,
+            NearPassDatabase::class.java,
+            "nearpass.db"
+        ).build()
+    }
+
+    private val viewModel by viewModels<NearPassViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return NearPassViewModel(db.dao) as T
+                }
+            }
+        }
+    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +62,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PassWatchTheme {
+                val state by viewModel.state.collectAsState()
+
                 val navController = rememberNavController()
                 NavHost(
                     navController = navController,
@@ -52,7 +78,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<RidesScreen> {
-                        RidesScreen()
+                        RidesScreen(state = state, onEvent = viewModel::onEvent)
                     }
 
                     composable<MapScreen> {

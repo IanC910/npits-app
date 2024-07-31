@@ -1,6 +1,6 @@
-package com.passer.passwatch
+package com.passer.passwatch.nearpass.domain
 
-import com.passer.passwatch.model.nearpass.NearPass
+import com.passer.passwatch.nearpass.data.NearPass
 
 data class NearPassState(
     val rideId : Int = 0,

@@ -1,4 +1,4 @@
-package com.passer.passwatch.model.ride
+package com.passer.passwatch.ride.data
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

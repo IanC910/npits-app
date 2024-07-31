@@ -1,4 +1,4 @@
-package com.passer.passwatch.screen
+package com.passer.passwatch.ride.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -23,9 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.passer.passwatch.AddRideDialog
-import com.passer.passwatch.RideEvent
-import com.passer.passwatch.RideState
+import com.passer.passwatch.core.NearPassScreen
+import com.passer.passwatch.ride.domain.RideEvent
+import com.passer.passwatch.ride.domain.RideState
 
 @Composable
 fun RidesScreen(

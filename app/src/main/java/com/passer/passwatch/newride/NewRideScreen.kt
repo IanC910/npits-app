@@ -1,4 +1,4 @@
-package com.passer.passwatch.screen
+package com.passer.passwatch.newride
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

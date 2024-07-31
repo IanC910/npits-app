@@ -1,9 +1,9 @@
-package com.passer.passwatch
+package com.passer.passwatch.nearpass.domain
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.passer.passwatch.model.nearpass.NearPass
-import com.passer.passwatch.model.nearpass.NearPassDao
+import com.passer.passwatch.nearpass.data.NearPass
+import com.passer.passwatch.nearpass.data.NearPassDao
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

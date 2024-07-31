@@ -1,9 +1,9 @@
-package com.passer.passwatch
+package com.passer.passwatch.ride.domain
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.passer.passwatch.model.ride.Ride
-import com.passer.passwatch.model.ride.RideDao
+import com.passer.passwatch.ride.data.Ride
+import com.passer.passwatch.ride.data.RideDao
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine

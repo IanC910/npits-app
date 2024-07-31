@@ -1,4 +1,4 @@
-package com.passer.passwatch.data
+package com.passer.passwatch.core.repo
 
 import android.util.Log
 import androidx.datastore.core.DataStore

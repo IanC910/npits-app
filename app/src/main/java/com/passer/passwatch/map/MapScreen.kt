@@ -1,4 +1,4 @@
-package com.passer.passwatch.screen
+package com.passer.passwatch.map
 
 import androidx.compose.runtime.Composable
 

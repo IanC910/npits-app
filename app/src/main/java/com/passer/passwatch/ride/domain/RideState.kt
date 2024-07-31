@@ -1,6 +1,6 @@
-package com.passer.passwatch
+package com.passer.passwatch.ride.domain
 
-import com.passer.passwatch.model.ride.Ride
+import com.passer.passwatch.ride.data.Ride
 
 data class RideState(
     val rides: List<Ride> = emptyList(),

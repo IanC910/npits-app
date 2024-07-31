@@ -18,15 +18,22 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
-import com.passer.passwatch.data.UserPreferencesRepository
-import com.passer.passwatch.model.NearPassDatabase
-import com.passer.passwatch.screen.MainMenuScreen
-import com.passer.passwatch.screen.MainScreen
-import com.passer.passwatch.screen.MapScreen
-import com.passer.passwatch.screen.NearPassScreen
-import com.passer.passwatch.screen.NewRideScreen
-import com.passer.passwatch.screen.RidesScreen
-import com.passer.passwatch.screen.SettingsScreen
+import com.passer.passwatch.core.MainMenuScreen
+import com.passer.passwatch.core.MapScreen
+import com.passer.passwatch.core.NearPassScreen
+import com.passer.passwatch.core.NewRideScreen
+import com.passer.passwatch.core.RidesScreen
+import com.passer.passwatch.core.SettingsScreen
+import com.passer.passwatch.core.repo.NearPassDatabase
+import com.passer.passwatch.core.repo.UserPreferencesRepository
+import com.passer.passwatch.map.MapScreen
+import com.passer.passwatch.nearpass.domain.NearPassEvent
+import com.passer.passwatch.nearpass.domain.NearPassViewModel
+import com.passer.passwatch.nearpass.presentation.NearPassScreen
+import com.passer.passwatch.newride.NewRideScreen
+import com.passer.passwatch.ride.domain.RideViewModel
+import com.passer.passwatch.ride.presentation.RidesScreen
+import com.passer.passwatch.settings.SettingsScreen
 import com.passer.passwatch.ui.theme.PassWatchTheme
 
 private const val PREFERENCE_NAME = "user_preferences"

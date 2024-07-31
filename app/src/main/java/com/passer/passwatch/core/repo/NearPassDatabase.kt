@@ -1,12 +1,11 @@
-package com.passer.passwatch.model
+package com.passer.passwatch.core.repo
 
-import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
-import com.passer.passwatch.model.nearpass.NearPass
-import com.passer.passwatch.model.nearpass.NearPassDao
-import com.passer.passwatch.model.ride.Ride
-import com.passer.passwatch.model.ride.RideDao
+import com.passer.passwatch.nearpass.data.NearPass
+import com.passer.passwatch.nearpass.data.NearPassDao
+import com.passer.passwatch.ride.data.Ride
+import com.passer.passwatch.ride.data.RideDao
 
 @Database(
     entities = [NearPass::class, Ride::class],

@@ -1,17 +1,17 @@
-package com.passer.passwatch.screen
+package com.passer.passwatch
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.passer.passwatch.core.RidesScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -19,12 +19,11 @@ fun MainScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 50.dp)
     ) {
 
         Button(
             onClick = {
-                navController.navigate(NewRideScreen)
+                navController.navigate(com.passer.passwatch.core.NewRideScreen)
             }
         ) {
             Text(text = "New Ride")
@@ -44,7 +43,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(MapScreen)
+                navController.navigate(com.passer.passwatch.core.MapScreen)
             }
         ) {
             Text(text = "Map")
@@ -54,7 +53,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(SettingsScreen)
+                navController.navigate(com.passer.passwatch.core.SettingsScreen)
             }
         ) {
             Text(text = "Settings")

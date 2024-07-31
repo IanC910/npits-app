@@ -1,4 +1,4 @@
-package com.passer.passwatch.screen
+package com.passer.passwatch.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Button
@@ -11,7 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import com.passer.passwatch.data.UserPreferencesRepository
+import com.passer.passwatch.core.repo.UserPreferencesRepository
 import kotlinx.coroutines.launch
 
 @Composable

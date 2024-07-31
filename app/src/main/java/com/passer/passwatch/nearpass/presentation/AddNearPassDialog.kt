@@ -1,4 +1,4 @@
-package com.passer.passwatch
+package com.passer.passwatch.nearpass.presentation
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -13,41 +13,61 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.passer.passwatch.nearpass.domain.NearPassEvent
+import com.passer.passwatch.nearpass.domain.NearPassState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddRideDialog(
-    state: RideState,
-    onEvent: (RideEvent) -> Unit,
+fun AddNearPassDialog(
+    state: NearPassState,
+    onEvent: (NearPassEvent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     BasicAlertDialog(
         onDismissRequest = {
-            onEvent(RideEvent.HideDialog)
+            onEvent(NearPassEvent.HideDialog)
         },
         modifier = modifier
     ) {
-        Text(text = "Add ride")
+        Text(text = "Add near pass")
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TextField(
-                value = state.startTime,
+                value = state.latitude,
                 onValueChange = {
-                    onEvent(RideEvent.SetStartTime(it.toLongOrNull()))
+                    onEvent(NearPassEvent.SetLatitude(it))
                 },
                 placeholder = {
-                    Text(text = "start time")
+                    Text(text = "latitude")
                 }
             )
             TextField(
-                value = state.endTime,
+                value = state.longitude,
                 onValueChange = {
-                    onEvent(RideEvent.SetEndTime(it.toLongOrNull()))
+                    onEvent(NearPassEvent.SetLongitude(it))
                 },
                 placeholder = {
-                    Text(text = "end time")
+                    Text(text = "longitude")
+                }
+            )
+            TextField(
+                value = state.distance,
+                onValueChange = {
+                    onEvent(NearPassEvent.SetDistance(it))
+                },
+                placeholder = {
+                    Text(text = "distance")
+                }
+            )
+            TextField(
+                value = state.speed,
+                onValueChange = {
+                    onEvent(NearPassEvent.SetSpeed(it))
+                },
+                placeholder = {
+                    Text(text = "speed")
                 }
             )
 
@@ -56,7 +76,7 @@ fun AddRideDialog(
                 contentAlignment = Alignment.CenterEnd
             ) {
                 Button(onClick = {
-                    onEvent(RideEvent.SaveRide)
+                    onEvent(NearPassEvent.SaveNearPass)
                 }) {
                     Text(text = "Save")
                 }

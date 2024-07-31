@@ -17,5 +17,8 @@ interface NearPassDao {
     suspend fun deleteNearPass(nearPass: NearPass)
 
     @Query("SELECT * FROM nearpass ORDER BY id ASC")
-    fun getContactsOrderedById() : Flow<List<NearPass>>
+    fun getNearPassesOrderedById() : Flow<List<NearPass>>
+
+    @Query("SELECT * FROM nearpass WHERE rideId = :rideId ORDER BY id ASC")
+    fun getNearPassesForRide(rideId : Int) : Flow<List<NearPass>>
 }

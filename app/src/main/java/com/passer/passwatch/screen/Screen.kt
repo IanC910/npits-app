@@ -18,3 +18,7 @@ data object MapScreen
 @Serializable
 data object SettingsScreen
 
+@Serializable
+data class NearPassScreen(
+    val rideId: Int,
+)

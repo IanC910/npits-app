@@ -2,6 +2,7 @@ package com.passer.passwatch
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
@@ -22,6 +23,7 @@ import com.passer.passwatch.model.NearPassDatabase
 import com.passer.passwatch.screen.MainMenuScreen
 import com.passer.passwatch.screen.MainScreen
 import com.passer.passwatch.screen.MapScreen
+import com.passer.passwatch.screen.NearPassScreen
 import com.passer.passwatch.screen.NewRideScreen
 import com.passer.passwatch.screen.RidesScreen
 import com.passer.passwatch.screen.SettingsScreen
@@ -90,15 +92,40 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<RidesScreen> {
-                        RidesScreen(state = nearPassState, onEvent = nearPassViewModel::onEvent)
+                        RidesScreen(
+                            navController = navController,
+                            state = rideState,
+                            onEvent = rideViewModel::onEvent
+                        )
                     }
 
                     composable<MapScreen> {
-                        MapScreen(state = rideState, onEvent = rideViewModel::onEvent)
+                        MapScreen()
                     }
 
                     composable<SettingsScreen> {
                         SettingsScreen(userRepo)
+                    }
+
+                    composable<NearPassScreen> {
+                        if (it.arguments == null) {
+                            Log.e("NearPassScreen", "arguments is null")
+                            return@composable
+                        }
+
+                        if (!it.arguments!!.containsKey("rideId")) {
+                            Log.e("NearPassScreen", "rideId is null")
+                            return@composable
+                        }
+
+                        nearPassViewModel.onEvent(
+                            NearPassEvent.SetRideId(it.arguments!!.getInt("rideId"))
+                        )
+
+                        NearPassScreen(
+                            state = nearPassState,
+                            onEvent = nearPassViewModel::onEvent
+                        )
                     }
                 }
             }

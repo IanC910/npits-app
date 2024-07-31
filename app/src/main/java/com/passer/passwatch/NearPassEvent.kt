@@ -3,6 +3,8 @@ package com.passer.passwatch
 import com.passer.passwatch.model.nearpass.NearPass
 
 sealed interface NearPassEvent {
+    data class SetRideId(val rideId: Int) : NearPassEvent
+
     data object SaveNearPass : NearPassEvent
 
     data class SetLatitude(val latitude: String) : NearPassEvent

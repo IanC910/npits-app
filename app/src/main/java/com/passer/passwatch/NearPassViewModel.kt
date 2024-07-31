@@ -4,20 +4,25 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.model.nearpass.NearPass
 import com.passer.passwatch.model.nearpass.NearPassDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class NearPassViewModel(
-    private val dao: NearPassDao
+    private val dao: NearPassDao,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(NearPassState())
-    private val _nearpasses = dao.getContactsOrderedById()
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val _nearpasses = _state.flatMapLatest { it ->
+        dao.getNearPassesForRide(it.rideId)
+    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     val state = combine(_state, _nearpasses) { state, nearpasses ->
         state.copy(
@@ -28,13 +33,15 @@ class NearPassViewModel(
 
     fun onEvent(event: NearPassEvent) {
         when (event) {
-            NearPassEvent.SaveNearPass -> {
+            is NearPassEvent.SaveNearPass -> {
+                val rideId = state.value.rideId
                 val latitude = state.value.latitude
                 val longitude = state.value.longitude
                 val distance = state.value.distance
                 val speed = state.value.speed
 
                 val nearPass = NearPass(
+                    rideId = rideId,
                     latitude = latitude.toDouble(),
                     longitude = longitude.toDouble(),
                     distance = distance.toDouble(),
@@ -45,13 +52,15 @@ class NearPassViewModel(
                     dao.insertNearPass(nearPass)
                 }
 
-                _state.update { it.copy(
-                    isAddingNearPass = false,
-                    latitude = "",
-                    longitude = "",
-                    distance = "",
-                    speed = ""
-                ) }
+                _state.update {
+                    it.copy(
+                        isAddingNearPass = false,
+                        latitude = "",
+                        longitude = "",
+                        distance = "",
+                        speed = ""
+                    )
+                }
 
             }
 
@@ -79,7 +88,7 @@ class NearPassViewModel(
                 }
             }
 
-            NearPassEvent.ShowDialog -> {
+            is NearPassEvent.ShowDialog -> {
                 _state.update {
                     it.copy(
                         isAddingNearPass = true
@@ -87,7 +96,7 @@ class NearPassViewModel(
                 }
             }
 
-            NearPassEvent.HideDialog -> {
+            is NearPassEvent.HideDialog -> {
                 _state.update {
                     it.copy(
                         isAddingNearPass = false
@@ -98,6 +107,14 @@ class NearPassViewModel(
             is NearPassEvent.DeleteNearPass -> {
                 viewModelScope.launch {
                     dao.deleteNearPass(event.nearPass)
+                }
+            }
+
+            is NearPassEvent.SetRideId -> {
+                _state.update {
+                    it.copy(
+                        rideId = event.rideId
+                    )
                 }
             }
         }

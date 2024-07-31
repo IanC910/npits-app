@@ -1,5 +1,7 @@
 package com.passer.passwatch
 
+import com.passer.passwatch.model.nearpass.NearPass
+
 sealed interface NearPassEvent {
     data object SaveNearPass : NearPassEvent
 

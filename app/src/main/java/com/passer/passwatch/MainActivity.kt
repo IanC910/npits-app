@@ -18,6 +18,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.room.Room
 import com.passer.passwatch.data.UserPreferencesRepository
+import com.passer.passwatch.model.NearPassDatabase
 import com.passer.passwatch.screen.MainMenuScreen
 import com.passer.passwatch.screen.MainScreen
 import com.passer.passwatch.screen.MapScreen
@@ -45,11 +46,21 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
-    private val viewModel by viewModels<NearPassViewModel>(
+    private val nearPassViewModel by viewModels<NearPassViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return NearPassViewModel(db.dao) as T
+                    return NearPassViewModel(db.nearPassDao) as T
+                }
+            }
+        }
+    )
+
+    private val rideViewModel by viewModels<RideViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return RideViewModel(db.rideDao) as T
                 }
             }
         }
@@ -62,7 +73,8 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PassWatchTheme {
-                val state by viewModel.state.collectAsState()
+                val nearPassState by nearPassViewModel.state.collectAsState()
+                val rideState by rideViewModel.state.collectAsState()
 
                 val navController = rememberNavController()
                 NavHost(
@@ -78,11 +90,11 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<RidesScreen> {
-                        RidesScreen(state = state, onEvent = viewModel::onEvent)
+                        RidesScreen(state = nearPassState, onEvent = nearPassViewModel::onEvent)
                     }
 
                     composable<MapScreen> {
-                        MapScreen()
+                        MapScreen(state = rideState, onEvent = rideViewModel::onEvent)
                     }
 
                     composable<SettingsScreen> {

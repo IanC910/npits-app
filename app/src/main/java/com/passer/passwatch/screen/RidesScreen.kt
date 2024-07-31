@@ -37,7 +37,7 @@ fun RidesScreen(
                 }) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add ride",
+                    contentDescription = "Add near pass",
                 )
             }
         }

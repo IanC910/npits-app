@@ -1,5 +1,7 @@
 package com.passer.passwatch
 
+import com.passer.passwatch.model.nearpass.NearPass
+
 data class NearPassState(
     val nearPasses : List<NearPass> = emptyList(),
     val latitude: String = "",

@@ -1,4 +1,4 @@
-package com.passer.passwatch
+package com.passer.passwatch.model.nearpass
 
 import androidx.room.Dao
 import androidx.room.Delete

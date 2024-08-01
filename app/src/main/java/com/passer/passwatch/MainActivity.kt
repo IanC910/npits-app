@@ -33,7 +33,8 @@ import com.passer.passwatch.nearpass.presentation.NearPassScreen
 import com.passer.passwatch.newride.NewRideScreen
 import com.passer.passwatch.ride.domain.RideViewModel
 import com.passer.passwatch.ride.presentation.RidesScreen
-import com.passer.passwatch.settings.SettingsScreen
+import com.passer.passwatch.settings.domain.SettingsViewModel
+import com.passer.passwatch.settings.presentation.SettingsScreen
 import com.passer.passwatch.ui.theme.PassWatchTheme
 
 private const val PREFERENCE_NAME = "user_preferences"
@@ -47,6 +48,7 @@ val MAC_KEY = stringPreferencesKey("hub_mac_address")
 
 class MainActivity : ComponentActivity() {
     lateinit var userRepo: UserPreferencesRepository
+
     private val db by lazy {
         Room.databaseBuilder(
             applicationContext,
@@ -75,6 +77,16 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    private val settingsViewModel by viewModels<SettingsViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SettingsViewModel(userRepo) as T
+                }
+            }
+        }
+    )
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +96,7 @@ class MainActivity : ComponentActivity() {
             PassWatchTheme {
                 val nearPassState by nearPassViewModel.state.collectAsState()
                 val rideState by rideViewModel.state.collectAsState()
+                val settingsState by settingsViewModel.state.collectAsState()
 
                 val navController = rememberNavController()
                 NavHost(
@@ -111,7 +124,10 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<SettingsScreen> {
-                        SettingsScreen(userRepo)
+                        SettingsScreen(
+                            state = settingsState,
+                            onEvent = settingsViewModel::onEvent
+                        )
                     }
 
                     composable<NearPassScreen> {

@@ -1,6 +1,7 @@
 package com.passer.passwatch
 
 import android.Manifest
+import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -89,7 +90,8 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return SettingsViewModel(userRepo) as T
+                    val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    return SettingsViewModel(userRepo, bluetoothManager) as T
                 }
             }
         }

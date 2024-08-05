@@ -9,9 +9,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -59,7 +61,8 @@ fun SettingsScreen(
             }
         }
         // scan for BLE devices
-        BleScannerResultsBox(state.scannedDevices,
+        BleScannerResultsBox(
+            state = state,
             onSelect = {
                 Log.d("SettingsScreen", "Selected device: ${it.address}")
                 onEvent(SettingsEvent.SaveMacAddress(it.address))
@@ -70,14 +73,19 @@ fun SettingsScreen(
 
 @Composable
 fun BleScannerResultsBox(
-    scannedDevices: List<BluetoothDevice>,
+    state: SettingsState,
     onSelect: (BluetoothDevice) -> Unit,
 ) {
 
-    Text("Scanned Devices:")
+    Row {
+        Text("Scanned Devices:")
+        if (state.scanning) {
+            CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+        }
+    }
     // Display scanned devices
     LazyColumn {
-        items(scannedDevices) { device ->
+        items(state.scannedDevices) { device ->
             BluetoothDeviceItem(bluetoothDevice = device, onSelect = onSelect)
         }
     }

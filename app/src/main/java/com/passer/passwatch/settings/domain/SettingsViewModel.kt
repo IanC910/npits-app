@@ -1,11 +1,12 @@
 package com.passer.passwatch.settings.domain
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -19,25 +20,25 @@ import kotlinx.coroutines.launch
 
 class SettingsViewModel(
     private val userPreferencesRepository: UserPreferencesRepository,
-    bluetoothManager: BluetoothManager
+    bluetoothManager: BluetoothManager,
 ) : ViewModel() {
+    private val scanPeriod: Long = 10000
     private val bleScanner = bluetoothManager.adapter.bluetoothLeScanner
+    private val handler = Handler(Looper.getMainLooper())
 
     private val _state = MutableStateFlow(SettingsState())
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
-    private val _scannedDevices = MutableStateFlow<List<BluetoothDevice>>(emptyList())
 
-    val state = combine(_state, _hubMacAddress, _scannedDevices) { state, hubMacAddress, scannedDevices ->
+    val state = combine(_state, _hubMacAddress) { state, hubMacAddress ->
         state.copy(
-            hubMacAddress = hubMacAddress,
-            scannedDevices = scannedDevices
+            hubMacAddress = hubMacAddress
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsState())
 
 
     @SuppressLint("MissingPermission")
-    fun onEvent(event: SettingsEvent){
-        when(event){
+    fun onEvent(event: SettingsEvent) {
+        when (event) {
             is SettingsEvent.SaveMacAddress -> {
                 val newMacAddress = event.newMacAddress
 
@@ -63,16 +64,32 @@ class SettingsViewModel(
                         .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
                         .build()
 
+
+                    handler.postDelayed({
+                        onEvent(SettingsEvent.StopScan)
+                    }, scanPeriod)
+
+                    _state.update {
+                        it.copy(
+                            scannedDevices = emptyList(),
+                            scanning = true
+                        )
+                    }
+
                     bleScanner.startScan(null, scanSettings, scanCallback)
                 }
             }
 
             is SettingsEvent.StopScan -> {
                 viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            scanning = false
+                        )
+                    }
+
                     bleScanner.stopScan(scanCallback)
                 }
-
-                _scannedDevices.update { emptyList() }
             }
         }
     }
@@ -83,7 +100,9 @@ class SettingsViewModel(
             val device = result.device
 
             if (!state.value.scannedDevices.contains(device)) {
-                _scannedDevices.update { it + device }
+                _state.update {
+                    it.copy(scannedDevices = _state.value.scannedDevices + device)
+                }
             }
         }
 

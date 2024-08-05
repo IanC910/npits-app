@@ -28,65 +28,58 @@ fun NearPassScreen(
     state: NearPassState,
     onEvent: (NearPassEvent) -> Unit,
 ) {
-    Scaffold(
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    onEvent(NearPassEvent.ShowDialog)
-                }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add near pass",
-                )
-            }
+    Scaffold(floatingActionButton = {
+        FloatingActionButton(onClick = {
+            onEvent(NearPassEvent.ShowDialog)
+        }) {
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add near pass",
+            )
         }
-    ) { padding ->
+    }) { padding ->
 
-        if(state.isAddingNearPass){
+        if (state.isAddingNearPass) {
             AddNearPassDialog(state = state, onEvent = onEvent)
         }
 
-        LazyColumn(
-            contentPadding = padding,
-            modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            item {
-                Text(
-                    "Near Passes for Ride ${state.rideId}",
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.padding(20.dp)
-                )
-            }
+        Column {
+            Text(
+                "Near Passes for Ride ${state.rideId}",
+                style = MaterialTheme.typography.headlineLarge,
+                modifier = Modifier.padding(20.dp)
+            )
 
-            items(state.nearPasses) { nearPass ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
+            LazyColumn(
+                contentPadding = padding,
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+                items(state.nearPasses) { nearPass ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text(text = "Latitude: ${nearPass.latitude}")
-                        Text(text = "Longitude: ${nearPass.longitude}")
-                        Text(text = "Distance: ${nearPass.distance}")
-                        Text(text = "Speed: ${nearPass.speed}")
-                    }
-                    IconButton(onClick = {
-                        onEvent(NearPassEvent.DeleteNearPass(nearPass))
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete near pass"
-                        )
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(text = "Latitude: ${nearPass.latitude}")
+                            Text(text = "Longitude: ${nearPass.longitude}")
+                            Text(text = "Distance: ${nearPass.distance}")
+                            Text(text = "Speed: ${nearPass.speed}")
+                        }
+                        IconButton(onClick = {
+                            onEvent(NearPassEvent.DeleteNearPass(nearPass))
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete near pass"
+                            )
+                        }
                     }
                 }
             }
         }
-
-
     }
-
-
 }
 
 

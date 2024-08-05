@@ -22,3 +22,6 @@ data object SettingsScreen
 data class NearPassScreen(
     val rideId: Int,
 )
+
+@Serializable
+data object TelemetryScreen

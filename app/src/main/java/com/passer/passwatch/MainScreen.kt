@@ -11,7 +11,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.passer.passwatch.core.MapScreen
 import com.passer.passwatch.core.RidesScreen
+import com.passer.passwatch.core.SettingsScreen
+import com.passer.passwatch.core.TelemetryScreen
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -43,7 +46,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(com.passer.passwatch.core.MapScreen)
+                navController.navigate(MapScreen)
             }
         ) {
             Text(text = "Map")
@@ -53,10 +56,21 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(com.passer.passwatch.core.SettingsScreen)
+                navController.navigate(SettingsScreen)
             }
         ) {
             Text(text = "Settings")
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+
+        Button(
+            onClick = {
+                navController.navigate(TelemetryScreen)
+            }
+        ){
+            Text(text = "Live Telemetry")
         }
 
     }

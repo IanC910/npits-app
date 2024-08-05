@@ -29,6 +29,7 @@ import com.passer.passwatch.core.NearPassScreen
 import com.passer.passwatch.core.NewRideScreen
 import com.passer.passwatch.core.RidesScreen
 import com.passer.passwatch.core.SettingsScreen
+import com.passer.passwatch.core.TelemetryScreen
 import com.passer.passwatch.core.repo.NearPassDatabase
 import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.map.MapScreen
@@ -40,6 +41,7 @@ import com.passer.passwatch.ride.domain.RideViewModel
 import com.passer.passwatch.ride.presentation.RidesScreen
 import com.passer.passwatch.settings.domain.SettingsViewModel
 import com.passer.passwatch.settings.presentation.SettingsScreen
+import com.passer.passwatch.telemetry.presentation.TelemetryScreen
 import com.passer.passwatch.ui.theme.PassWatchTheme
 
 private const val PREFERENCE_NAME = "user_preferences"
@@ -163,6 +165,10 @@ class MainActivity : ComponentActivity() {
                             state = settingsState,
                             onEvent = settingsViewModel::onEvent
                         )
+                    }
+
+                    composable<TelemetryScreen> {
+                        TelemetryScreen()
                     }
 
                     composable<NearPassScreen> {

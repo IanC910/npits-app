@@ -9,6 +9,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.core.app.ActivityCompat
@@ -41,6 +42,8 @@ import com.passer.passwatch.ride.domain.RideViewModel
 import com.passer.passwatch.ride.presentation.RidesScreen
 import com.passer.passwatch.settings.domain.SettingsViewModel
 import com.passer.passwatch.settings.presentation.SettingsScreen
+import com.passer.passwatch.telemetry.domain.TelemetryEvent
+import com.passer.passwatch.telemetry.domain.TelemetryViewModel
 import com.passer.passwatch.telemetry.presentation.TelemetryScreen
 import com.passer.passwatch.ui.theme.PassWatchTheme
 
@@ -68,6 +71,7 @@ class MainActivity : ComponentActivity() {
         ).build()
     }
 
+    @Suppress("UNCHECKED_CAST")
     private val nearPassViewModel by viewModels<NearPassViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -78,6 +82,7 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    @Suppress("UNCHECKED_CAST")
     private val rideViewModel by viewModels<RideViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -88,12 +93,27 @@ class MainActivity : ComponentActivity() {
         }
     )
 
+    @Suppress("UNCHECKED_CAST")
     private val settingsViewModel by viewModels<SettingsViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    val bluetoothManager = getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    val bluetoothManager =
+                        getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                     return SettingsViewModel(userRepo, bluetoothManager) as T
+                }
+            }
+        }
+    )
+
+    @Suppress("UNCHECKED_CAST")
+    private val telemetryViewModel by viewModels<TelemetryViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    val bluetoothManager =
+                        getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    return TelemetryViewModel(applicationContext, bluetoothManager) as T
                 }
             }
         }
@@ -104,29 +124,69 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         userRepo = UserPreferencesRepository(dataStore)
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Log.i("MainActivity", "Requesting Bluetooth permission")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH), REQUEST_BLUETOOTH_PERMISSION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.BLUETOOTH),
+                REQUEST_BLUETOOTH_PERMISSION
+            )
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_SCAN
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Log.i("MainActivity", "Requesting Bluetooth permission")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_SCAN), REQUEST_BLUETOOTH_PERMISSION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.BLUETOOTH_SCAN),
+                REQUEST_BLUETOOTH_PERMISSION
+            )
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_ADMIN
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Log.i("MainActivity", "Requesting Bluetooth permission")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_ADMIN), REQUEST_BLUETOOTH_PERMISSION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.BLUETOOTH_ADMIN),
+                REQUEST_BLUETOOTH_PERMISSION
+            )
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.BLUETOOTH_CONNECT
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Log.i("MainActivity", "Requesting Bluetooth permission")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.BLUETOOTH_CONNECT), REQUEST_BLUETOOTH_PERMISSION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.BLUETOOTH_CONNECT),
+                REQUEST_BLUETOOTH_PERMISSION
+            )
         }
 
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_BACKGROUND_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACCESS_BACKGROUND_LOCATION
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
             Log.i("MainActivity", "Requesting Bluetooth permission")
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION), REQUEST_BLUETOOTH_PERMISSION)
+            ActivityCompat.requestPermissions(
+                this,
+                arrayOf(Manifest.permission.ACCESS_BACKGROUND_LOCATION),
+                REQUEST_BLUETOOTH_PERMISSION
+            )
         }
 
         setContent {
@@ -134,6 +194,7 @@ class MainActivity : ComponentActivity() {
                 val nearPassState by nearPassViewModel.state.collectAsState()
                 val rideState by rideViewModel.state.collectAsState()
                 val settingsState by settingsViewModel.state.collectAsState()
+                val telemetryState by telemetryViewModel.state.collectAsState()
 
                 val navController = rememberNavController()
                 NavHost(
@@ -162,13 +223,39 @@ class MainActivity : ComponentActivity() {
 
                     composable<SettingsScreen> {
                         SettingsScreen(
+                            navController = navController,
                             state = settingsState,
                             onEvent = settingsViewModel::onEvent
                         )
                     }
 
                     composable<TelemetryScreen> {
-                        TelemetryScreen()
+                        if (it.arguments == null) {
+                            Log.e("TelemetryScreen", "arguments is null")
+                            return@composable
+                        }
+
+                        if (!it.arguments!!.containsKey("macAddress")) {
+                            Log.e("TelemetryScreen", "macAddress is null")
+                            return@composable
+                        }
+
+                        val macAddress = it.arguments!!.getString("macAddress")!!
+
+                        telemetryViewModel.onEvent(
+                            TelemetryEvent.SetMacAddress(macAddress)
+                        )
+
+                        LaunchedEffect(key1 = macAddress) {
+                            telemetryViewModel.onEvent(
+                                TelemetryEvent.ClearServiceCache
+                            )
+                        }
+
+                        TelemetryScreen(
+                            state = telemetryState,
+                            onEvent = telemetryViewModel::onEvent
+                        )
                     }
 
                     composable<NearPassScreen> {

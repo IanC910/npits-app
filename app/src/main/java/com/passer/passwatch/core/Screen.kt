@@ -24,4 +24,6 @@ data class NearPassScreen(
 )
 
 @Serializable
-data object TelemetryScreen
+data class TelemetryScreen(
+    val macAddress: String,
+)

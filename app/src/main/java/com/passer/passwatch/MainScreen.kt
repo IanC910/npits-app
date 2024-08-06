@@ -63,15 +63,5 @@ fun MainScreen(navController: NavController) {
         }
 
         Spacer(modifier = Modifier.height(20.dp))
-
-
-        Button(
-            onClick = {
-                navController.navigate(TelemetryScreen)
-            }
-        ){
-            Text(text = "Live Telemetry")
-        }
-
     }
 }

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
 
@@ -28,6 +29,7 @@ import com.passer.passwatch.settings.domain.SettingsState
 fun SettingsScreen(
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
+    navController: NavHostController,
 ) {
     Column {
         // Display current MAC address
@@ -58,6 +60,18 @@ fun SettingsScreen(
                 onEvent(SettingsEvent.StopScan)
             }) {
                 Text("Stop Scan")
+            }
+
+            Button(
+                onClick = {
+                    navController.navigate(
+                        com.passer.passwatch.core.TelemetryScreen(
+                            macAddress = state.hubMacAddress,
+                        )
+                    )
+                }
+            ) {
+                Text(text = "Live Telemetry")
             }
         }
         // scan for BLE devices

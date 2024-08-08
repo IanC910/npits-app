@@ -10,5 +10,6 @@ data class NearPassState(
     val longitude: String = "",
     val distance: String = "",
     val speed: String = "",
+    val time: String = "",
     val isAddingNearPass: Boolean = false,
 )

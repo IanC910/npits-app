@@ -20,6 +20,7 @@ data class NearPass(
     val longitude: Double,
     val distance: Double,
     val speed: Double,
+    val time: Long,
 
     val rideId: Int? = null,
 

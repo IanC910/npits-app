@@ -7,6 +7,7 @@ sealed interface NearPassEvent {
 
     data object SaveNearPass : NearPassEvent
 
+    data class SetTime(val time: String) : NearPassEvent
     data class SetLatitude(val latitude: String) : NearPassEvent
     data class SetLongitude(val longitude: String) : NearPassEvent
     data class SetDistance(val distance: String) : NearPassEvent

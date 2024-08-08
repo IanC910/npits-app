@@ -14,7 +14,7 @@ import androidx.navigation.NavController
 import com.passer.passwatch.core.MapScreen
 import com.passer.passwatch.core.RidesScreen
 import com.passer.passwatch.core.SettingsScreen
-import com.passer.passwatch.core.TelemetryScreen
+import com.passer.passwatch.core.ble.UUIDConstants
 
 @Composable
 fun MainScreen(navController: NavController) {

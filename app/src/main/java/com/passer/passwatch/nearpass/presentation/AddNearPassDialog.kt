@@ -35,6 +35,15 @@ fun AddNearPassDialog(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             TextField(
+                value = state.time,
+                onValueChange = {
+                    onEvent(NearPassEvent.SetTime(it))
+                },
+                placeholder = {
+                    Text(text = "time")
+                }
+            )
+            TextField(
                 value = state.latitude,
                 onValueChange = {
                     onEvent(NearPassEvent.SetLatitude(it))

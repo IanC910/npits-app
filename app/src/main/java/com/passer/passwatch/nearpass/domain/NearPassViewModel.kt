@@ -39,6 +39,7 @@ class NearPassViewModel(
                 val longitude = state.value.longitude
                 val distance = state.value.distance
                 val speed = state.value.speed
+                val time = state.value.time
 
                 val nearPass = NearPass(
                     rideId = rideId,
@@ -46,6 +47,7 @@ class NearPassViewModel(
                     longitude = longitude.toDouble(),
                     distance = distance.toDouble(),
                     speed = speed.toDouble(),
+                    time = time.toLong(),
                 )
 
                 viewModelScope.launch {
@@ -62,6 +64,12 @@ class NearPassViewModel(
                     )
                 }
 
+            }
+
+            is NearPassEvent.SetTime -> {
+                _state.update {
+                    it.copy(time = event.time)
+                }
             }
 
             is NearPassEvent.SetLatitude -> {

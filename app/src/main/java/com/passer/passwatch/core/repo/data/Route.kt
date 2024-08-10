@@ -1,9 +1,10 @@
-package com.passer.passwatch.nearpass.data
+package com.passer.passwatch.core.repo.data
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.passer.passwatch.ride.data.Ride
+
 
 @Entity(
     foreignKeys = [
@@ -15,12 +16,12 @@ import com.passer.passwatch.ride.data.Ride
         )
     ]
 )
-data class NearPass(
-    val latitude: Double?,
-    val longitude: Double?,
-    val distance: Double?,
+
+data class Route(
+    val latitude: Double,
+    val longitude: Double,
     val speed: Double?,
-    val time: Long?,
+    val time: Long,
 
     val rideId: Int? = null,
 

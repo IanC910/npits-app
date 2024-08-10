@@ -24,6 +24,7 @@ fun NewRideScreen(
             Button(onClick = { onEvent(NewRideEvent.StopRide) }) {
                 Text(text = "Stop Ride")
             }
+            Text(text = "You are on Ride ${state.rideId}")
             Text(text = "Elapsed Time: ${formatTime(state.rideTime)}")
         }
     }

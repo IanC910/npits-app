@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.passer.passwatch.core.MapScreen
+import com.passer.passwatch.core.NewRideScreen
 import com.passer.passwatch.core.RidesScreen
 import com.passer.passwatch.core.SettingsScreen
 import com.passer.passwatch.core.ble.UUIDConstants
@@ -26,7 +27,7 @@ fun MainScreen(navController: NavController) {
 
         Button(
             onClick = {
-                navController.navigate(com.passer.passwatch.core.NewRideScreen)
+                navController.navigate(NewRideScreen)
             }
         ) {
             Text(text = "New Ride")

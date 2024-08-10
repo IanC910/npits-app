@@ -37,7 +37,8 @@ import com.passer.passwatch.map.MapScreen
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassViewModel
 import com.passer.passwatch.nearpass.presentation.NearPassScreen
-import com.passer.passwatch.newride.NewRideScreen
+import com.passer.passwatch.newride.domain.NewRideViewModel
+import com.passer.passwatch.newride.presentation.NewRideScreen
 import com.passer.passwatch.ride.domain.RideViewModel
 import com.passer.passwatch.ride.presentation.RidesScreen
 import com.passer.passwatch.settings.domain.SettingsViewModel
@@ -70,6 +71,17 @@ class MainActivity : ComponentActivity() {
             "nearpass.db"
         ).build()
     }
+
+    @Suppress("UNCHECKED_CAST")
+    private val newRideViewModel by viewModels<NewRideViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return NewRideViewModel() as T
+                }
+            }
+        }
+    )
 
     @Suppress("UNCHECKED_CAST")
     private val nearPassViewModel by viewModels<NearPassViewModel>(
@@ -191,6 +203,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             PassWatchTheme {
+                val newRideState by newRideViewModel.state.collectAsState()
                 val nearPassState by nearPassViewModel.state.collectAsState()
                 val rideState by rideViewModel.state.collectAsState()
                 val settingsState by settingsViewModel.state.collectAsState()
@@ -206,7 +219,7 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<NewRideScreen> {
-                        NewRideScreen()
+                        NewRideScreen(newRideState, newRideViewModel::onEvent)
                     }
 
                     composable<RidesScreen> {

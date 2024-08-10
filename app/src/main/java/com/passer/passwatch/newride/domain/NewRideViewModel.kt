@@ -230,6 +230,7 @@ class NewRideViewModel(
             }
         }
 
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         override fun onCharacteristicChanged(
             gatt: BluetoothGatt,
             characteristic: BluetoothGattCharacteristic,
@@ -267,7 +268,7 @@ class NewRideViewModel(
                     longitude = longitude,
                     distance = distance?.toDouble(),
                     speed = speed?.toDouble(),
-                    time = time?.toLong(),
+                    time = System.currentTimeMillis(),
                 )
 
                 viewModelScope.launch {

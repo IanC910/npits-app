@@ -36,7 +36,9 @@ import com.passer.passwatch.core.SettingsScreen
 import com.passer.passwatch.core.TelemetryScreen
 import com.passer.passwatch.core.repo.NearPassDatabase
 import com.passer.passwatch.core.repo.UserPreferencesRepository
-import com.passer.passwatch.map.MapScreen
+import com.passer.passwatch.map.domain.MapEvent
+import com.passer.passwatch.map.domain.MapViewModel
+import com.passer.passwatch.map.presentation.MapScreen
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassViewModel
 import com.passer.passwatch.nearpass.presentation.NearPassScreen
@@ -121,6 +123,17 @@ class MainActivity : ComponentActivity() {
     )
 
     @Suppress("UNCHECKED_CAST")
+    private val mapViewModel by viewModels<MapViewModel>(
+        factoryProducer = {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return MapViewModel(db.routeDao, db.nearPassDao) as T
+                }
+            }
+        }
+    )
+
+    @Suppress("UNCHECKED_CAST")
     private val settingsViewModel by viewModels<SettingsViewModel>(
         factoryProducer = {
             object : ViewModelProvider.Factory {
@@ -174,6 +187,7 @@ class MainActivity : ComponentActivity() {
                 val newRideState by newRideViewModel.state.collectAsState()
                 val nearPassState by nearPassViewModel.state.collectAsState()
                 val rideState by rideViewModel.state.collectAsState()
+                val mapState by mapViewModel.state.collectAsState()
                 val settingsState by settingsViewModel.state.collectAsState()
                 val telemetryState by telemetryViewModel.state.collectAsState()
 
@@ -203,7 +217,24 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<MapScreen> {
-                        MapScreen()
+                        if (it.arguments == null) {
+                            Log.e("MapScreen", "arguments is null")
+                            return@composable
+                        }
+
+                        if (!it.arguments!!.containsKey("rideId")) {
+                            Log.e("MapScreen", "rideId is null")
+                            return@composable
+                        }
+
+                        mapViewModel.onEvent(
+                            MapEvent.SetRideId(it.arguments!!.getInt("rideId"))
+                        )
+
+                        MapScreen(
+                            state = mapState,
+                            onEvent = mapViewModel::onEvent
+                        )
                     }
 
                     composable<SettingsScreen> {

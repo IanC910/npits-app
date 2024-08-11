@@ -1,5 +1,6 @@
 package com.passer.passwatch.settings.domain
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
@@ -11,8 +12,10 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.repo.UserPreferencesRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -28,12 +31,14 @@ class SettingsViewModel(
 
     private val _state = MutableStateFlow(SettingsState())
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
+    private val _permissionNeeded = MutableSharedFlow<String>()
 
     val state = combine(_state, _hubMacAddress) { state, hubMacAddress ->
         state.copy(
             hubMacAddress = hubMacAddress
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsState())
+    val permissionNeeded = _permissionNeeded.asSharedFlow()
 
 
     @SuppressLint("MissingPermission")
@@ -59,6 +64,7 @@ class SettingsViewModel(
 
             is SettingsEvent.StartScan -> {
                 viewModelScope.launch {
+                    _permissionNeeded.emit(Manifest.permission.BLUETOOTH_CONNECT)
                     val scanSettings: ScanSettings = ScanSettings.Builder()
                         .setCallbackType(ScanSettings.CALLBACK_TYPE_ALL_MATCHES)
                         .setScanMode(ScanSettings.SCAN_MODE_BALANCED)
@@ -89,6 +95,12 @@ class SettingsViewModel(
                     }
 
                     bleScanner.stopScan(scanCallback)
+                }
+            }
+
+            is SettingsEvent.RequestPermissions -> {
+                viewModelScope.launch {
+                    _permissionNeeded.emit(Manifest.permission.BLUETOOTH_SCAN)
                 }
             }
         }

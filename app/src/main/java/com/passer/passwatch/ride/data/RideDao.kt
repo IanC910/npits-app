@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.Flow
 interface RideDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertRide(ride: Ride)
+    suspend fun insertRide(ride: Ride) : Long
 
     @Delete
     suspend fun deleteRide(ride: Ride)
 
     @Query("SELECT * FROM ride ORDER BY id ASC")
     fun getRidesOrderedById() : Flow<List<Ride>>
+
+    @Query("UPDATE ride SET endTime = :endTime WHERE id = :rideId")
+    suspend fun updateRideEndTime(rideId: Int, endTime: Long)
 }

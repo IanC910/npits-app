@@ -126,6 +126,7 @@ class NewRideViewModel(
 
             is NewRideEvent.StopRide -> {
                 timerJob?.cancel()
+                bluetoothGatt?.close()
                 locationManager.removeUpdates(locationListener)
 
                 viewModelScope.launch {
@@ -149,8 +150,8 @@ class NewRideViewModel(
 
     override fun onCleared() {
         super.onCleared()
-        timerJob?.cancel()
-        locationManager.removeUpdates(locationListener)
+
+        onEvent(NewRideEvent.StopRide)
 
         Log.i("NewRideViewModel", "onCleared")
     }

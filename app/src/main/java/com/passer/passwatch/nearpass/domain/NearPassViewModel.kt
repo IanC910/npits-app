@@ -20,7 +20,7 @@ class NearPassViewModel(
     private val _state = MutableStateFlow(NearPassState())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val _nearpasses = _state.flatMapLatest { it ->
+    private val _nearpasses = _state.flatMapLatest {
         dao.getNearPassesForRide(it.rideId)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 

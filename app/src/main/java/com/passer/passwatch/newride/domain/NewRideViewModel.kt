@@ -23,17 +23,20 @@ import com.passer.passwatch.nearpass.data.NearPass
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class NewRideViewModel(
     private val applicationContext: Context,
     userPreferencesRepository: UserPreferencesRepository,
@@ -45,14 +48,25 @@ class NewRideViewModel(
 ) : ViewModel() {
     private val _state = MutableStateFlow(NewRideState())
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
+    private val _nearpasses = _state.flatMapLatest {
+        nearPassDao.getNearPassesForRide(it.rideId)
+    }
+    private val _routes = _state.flatMapLatest {
+        routeDao.getRoutesForRide(it.rideId)
+    }
     private val _permissionNeeded = MutableSharedFlow<String>()
-
-    val state = _state.asStateFlow().stateIn(
-        viewModelScope, SharingStarted.WhileSubscribed(5000), NewRideState()
-    )
 
     private val hubMacAddress = _hubMacAddress.stateIn(
         viewModelScope, SharingStarted.Eagerly, ""
+    )
+
+    val state = combine(_state, _nearpasses, _routes) { state, nearpasses, routes ->
+        state.copy(
+            nearPasses = nearpasses,
+            routes = routes
+        )
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), NewRideState()
     )
 
     val permissionNeeded = _permissionNeeded.asSharedFlow()
@@ -117,7 +131,10 @@ class NewRideViewModel(
                             device.connectGatt(applicationContext, true, bluetoothGattCallback)
 
                     } catch (exception: IllegalArgumentException) {
-                        Log.w("TelemetryViewModel", "Device not found with MAC address: ${hubMacAddress.value}")
+                        Log.w(
+                            "TelemetryViewModel",
+                            "Device not found with MAC address: ${hubMacAddress.value}"
+                        )
                     }
                 } ?: run {
                     Log.w("TelemetryViewModel", "Bluetooth adapter is null")
@@ -251,17 +268,21 @@ class NewRideViewModel(
             }
 
             // Near pass flag was triggered
-            if(characteristic.uuid.toString() == UUIDConstants.NEAR_PASS_FLAG_CHARACTERISTIC_UUID.uuid.toString()){
+            if (characteristic.uuid.toString() == UUIDConstants.NEAR_PASS_FLAG_CHARACTERISTIC_UUID.uuid.toString()) {
                 Log.i("TelemetryViewModel", "Near pass flag triggered")
-                val lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                val lastLocation =
+                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
                 Log.i("TelemetryViewModel", "Last location: $lastLocation")
 
                 val rideId = state.value.rideId
                 val latitude = lastLocation?.latitude
                 val longitude = lastLocation?.longitude
-                val distance = state.value.characteristicValue[UUIDConstants.DISTANCE_CHARACTERISTIC_UUID.uuid.toString()]
-                val speed = state.value.characteristicValue[UUIDConstants.SPEED_CHARACTERISTIC_UUID.uuid.toString()]
-                val time = state.value.characteristicValue[UUIDConstants.TIME_CHARACTERISTIC_UUID.uuid.toString()]
+                val distance =
+                    state.value.characteristicValue[UUIDConstants.DISTANCE_CHARACTERISTIC_UUID.uuid.toString()]
+                val speed =
+                    state.value.characteristicValue[UUIDConstants.SPEED_CHARACTERISTIC_UUID.uuid.toString()]
+                val time =
+                    state.value.characteristicValue[UUIDConstants.TIME_CHARACTERISTIC_UUID.uuid.toString()]
 
                 val nearPass = NearPass(
                     rideId = rideId,
@@ -276,7 +297,11 @@ class NewRideViewModel(
                     nearPassDao.insertNearPass(nearPass)
                 }
                 // clear the near pass flag
-                gatt.writeCharacteristic(characteristic, ByteArray(0), BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                gatt.writeCharacteristic(
+                    characteristic,
+                    ByteArray(0),
+                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+                )
             }
         }
     }

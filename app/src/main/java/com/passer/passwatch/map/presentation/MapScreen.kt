@@ -24,6 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
@@ -66,17 +67,15 @@ fun MapScreen(
 ) {
     val context = LocalContext.current
 
-    // Determine the initial camera position based on the last Route
-    val lastRoute = state.routes.lastOrNull()
-    val initialCameraPosition = lastRoute?.let {
-        LatLng(it.latitude, it.longitude)
-    } ?: LatLng(0.0, 0.0) // Default to (0.0, 0.0) if no routes are available
+    val cameraPositionState = rememberCameraPositionState()
 
-    val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(
-            initialCameraPosition,
-            15f
-        )
+    // Update the camera position after composition
+    LaunchedEffect(state.routes) {
+        val lastRoute = state.routes.lastOrNull()
+        if (lastRoute != null) {
+            val lastPosition = LatLng(lastRoute.latitude, lastRoute.longitude)
+            cameraPositionState.move(CameraUpdateFactory.newLatLngZoom(lastPosition, 15f))
+        }
     }
 
     Column(

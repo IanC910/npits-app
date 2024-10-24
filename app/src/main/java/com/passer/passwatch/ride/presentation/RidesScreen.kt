@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.passer.passwatch.core.MapScreen
 import com.passer.passwatch.core.NearPassScreen
 import com.passer.passwatch.ride.domain.RideEvent
 import com.passer.passwatch.ride.domain.RideState
@@ -74,6 +76,20 @@ fun RidesScreen(
                         Text(text = "Ride #${ride.id}", fontSize = 20.sp)
                         Text(text = "Start Time: ${ride.startTime}")
                         Text(text = "End Time: ${ride.endTime}")
+                    }
+                    IconButton(onClick = {
+                        // navigate to map for a particular ride ID
+
+                        navController.navigate(
+                            MapScreen(
+                                rideId = ride.id
+                            )
+                        )
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.LocationOn,
+                            contentDescription = "View Map",
+                        )
                     }
                     IconButton(onClick = {
                         // navigate to near passes for a particular ride ID

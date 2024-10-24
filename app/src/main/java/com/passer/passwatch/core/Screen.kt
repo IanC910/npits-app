@@ -13,7 +13,9 @@ data object NewRideScreen
 data object RidesScreen
 
 @Serializable
-data object MapScreen
+data class MapScreen(
+    val rideId: Int,
+)
 
 @Serializable
 data object SettingsScreen

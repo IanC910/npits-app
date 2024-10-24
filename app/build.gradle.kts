@@ -52,7 +52,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(platform(libs.androidx.compose.bom))
@@ -70,13 +69,18 @@ dependencies {
 
     // Room
     implementation(libs.androidx.room.ktx)
+    implementation(libs.play.services.maps)
     ksp(libs.androidx.room.compiler)
 
     // UUIDs
     implementation(libs.java.uuid.generator)
 
     // Location
-    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.gms.play.services.location)
+
+    // Google Maps
+    implementation(libs.play.services.maps)
+    implementation(libs.maps.compose)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

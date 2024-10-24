@@ -1,5 +1,6 @@
 package com.passer.passwatch.ride.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,6 +22,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -28,6 +30,9 @@ import com.passer.passwatch.core.MapScreen
 import com.passer.passwatch.core.NearPassScreen
 import com.passer.passwatch.ride.domain.RideEvent
 import com.passer.passwatch.ride.domain.RideState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun RidesScreen(
@@ -55,13 +60,16 @@ fun RidesScreen(
 
         LazyColumn(
             contentPadding = padding,
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color(0xFF282828)), // Apply consistent dark background
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
                 Text(
                     "Rides",
                     style = MaterialTheme.typography.headlineLarge,
+                    color = Color.White, // White text for visibility
                     modifier = Modifier.padding(20.dp)
                 )
             }
@@ -73,13 +81,11 @@ fun RidesScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Ride #${ride.id}", fontSize = 20.sp)
-                        Text(text = "Start Time: ${ride.startTime}")
-                        Text(text = "End Time: ${ride.endTime}")
+                        Text(text = "Ride #${ride.id}", fontSize = 20.sp, color = Color.White) // White text
+                        Text(text = "Start Time: ${ride.startTime?.let { formatTimestamp(it) }}", color = Color.White) // White text
+                        Text(text = "End Time: ${ride.endTime?.let { formatTimestamp(it) }}", color = Color.White) // White text
                     }
                     IconButton(onClick = {
-                        // navigate to map for a particular ride ID
-
                         navController.navigate(
                             MapScreen(
                                 rideId = ride.id
@@ -89,11 +95,10 @@ fun RidesScreen(
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = "View Map",
+                            tint = Color.White // White icon for visibility
                         )
                     }
                     IconButton(onClick = {
-                        // navigate to near passes for a particular ride ID
-
                         navController.navigate(
                             NearPassScreen(
                                 rideId = ride.id
@@ -103,6 +108,7 @@ fun RidesScreen(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "View Near Passes",
+                            tint = Color.White // White icon for visibility
                         )
                     }
                     IconButton(onClick = {
@@ -110,13 +116,18 @@ fun RidesScreen(
                     }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete near pass"
+                            contentDescription = "Delete ride",
+                            tint = Color.White // White icon for visibility
                         )
                     }
                 }
             }
         }
-
     }
 }
 
+// Utility function to format timestamp
+fun formatTimestamp(timestamp: Long): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(Date(timestamp))
+}

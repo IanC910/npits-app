@@ -3,6 +3,7 @@ package com.passer.passwatch.settings.presentation
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -28,11 +30,11 @@ fun SettingsScreen(
     navController: NavHostController,
 ) {
     Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Top,
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color(0xFF282828))
     ) {
         // Display current MAC address
         Text("Current Hub MAC Address: ${state.hubMacAddress}", modifier = Modifier.padding(bottom = 16.dp))
@@ -59,23 +61,17 @@ fun SettingsScreen(
                 .padding(vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
+            // Conditional Start/Stop Scan button
             CustomButton(
-                text = "Start Scan",
-                onClick = { onEvent(SettingsEvent.StartScan) },
-                modifier = Modifier.fillMaxWidth(0.4f)
-            )
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 5.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            CustomButton(
-                text = "Stop Scan",
-                onClick = { onEvent(SettingsEvent.StopScan) },
-                modifier = Modifier.fillMaxWidth(0.4f)
+                text = if (state.scanning) "Scanning devices..." else "Scan for devices",
+                onClick = {
+                    if (state.scanning) {
+                        onEvent(SettingsEvent.StopScan)
+                    } else {
+                        onEvent(SettingsEvent.StartScan)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(0.475f)
             )
         }
 

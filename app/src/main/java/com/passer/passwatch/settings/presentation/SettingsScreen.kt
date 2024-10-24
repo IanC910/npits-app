@@ -4,24 +4,20 @@ import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.util.Log
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.passer.passwatch.core.CustomButton
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
 
@@ -31,50 +27,71 @@ fun SettingsScreen(
     onEvent: (SettingsEvent) -> Unit,
     navController: NavHostController,
 ) {
-    Column {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Top,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         // Display current MAC address
-        Text("Current Hub MAC Address: ${state.hubMacAddress}")
+        Text("Current Hub MAC Address: ${state.hubMacAddress}", modifier = Modifier.padding(bottom = 16.dp))
 
         // Input field for new MAC address
         OutlinedTextField(
             value = state.newHubMacAddress,
             onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
-            label = { Text("Enter new Hub MAC Address") }
+            label = { Text("Enter new Hub MAC Address") },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
         )
 
-        // Button to save new MAC address
-        Button(onClick = {
-            onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress))
-        }) {
-            Text("Save")
+        // Custom buttons for Save, Start Scan, Stop Scan, and Live Telemetry
+        CustomButton(
+            text = "Save",
+            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) }
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            CustomButton(
+                text = "Start Scan",
+                onClick = { onEvent(SettingsEvent.StartScan) },
+                modifier = Modifier.fillMaxWidth(0.4f)
+            )
         }
 
-        Row {
-            Button(onClick = {
-                onEvent(SettingsEvent.StartScan)
-            }) {
-                Text("Start Scan")
-            }
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 5.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            CustomButton(
+                text = "Stop Scan",
+                onClick = { onEvent(SettingsEvent.StopScan) },
+                modifier = Modifier.fillMaxWidth(0.4f)
+            )
+        }
 
-            Button(onClick = {
-                onEvent(SettingsEvent.StopScan)
-            }) {
-                Text("Stop Scan")
-            }
-
-            Button(
-                onClick = {
-                    navController.navigate(
-                        com.passer.passwatch.core.TelemetryScreen(
-                            macAddress = state.hubMacAddress,
-                        )
+        CustomButton(
+            text = "Live Telemetry",
+            onClick = {
+                navController.navigate(
+                    com.passer.passwatch.core.TelemetryScreen(
+                        macAddress = state.hubMacAddress,
                     )
-                }
-            ) {
-                Text(text = "Live Telemetry")
-            }
-        }
-        // scan for BLE devices
+                )
+            },
+            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+        )
+
+        // BLE devices scanning section
         BleScannerResultsBox(
             state = state,
             onSelect = {
@@ -90,15 +107,20 @@ fun BleScannerResultsBox(
     state: SettingsState,
     onSelect: (BluetoothDevice) -> Unit,
 ) {
-
-    Row {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 16.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Text("Scanned Devices:")
         if (state.scanning) {
             CircularProgressIndicator(modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
         }
     }
-    // Display scanned devices
-    LazyColumn {
+
+    LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(state.scannedDevices) { device ->
             BluetoothDeviceItem(bluetoothDevice = device, onSelect = onSelect)
         }
@@ -113,22 +135,24 @@ fun BluetoothDeviceItem(
 ) {
     Row(
         modifier = Modifier
-            .padding(vertical = 8.dp)
             .fillMaxWidth()
-            .clickable { onSelect(bluetoothDevice) },
-        horizontalArrangement = Arrangement.SpaceBetween,
+            .clickable { onSelect(bluetoothDevice) }
+            .padding(8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            bluetoothDevice.name ?: "N/A",
-            style = TextStyle(fontWeight = FontWeight.Normal),
-        )
-        Text(bluetoothDevice.address)
-        val state = when (bluetoothDevice.bondState) {
-            BluetoothDevice.BOND_BONDED -> "Paired"
-            BluetoothDevice.BOND_BONDING -> "Pairing"
-            else -> "None"
+        Column {
+            Text(
+                text = bluetoothDevice.name ?: "Unknown Device",
+                style = TextStyle(fontWeight = FontWeight.Bold)
+            )
+            Text(text = bluetoothDevice.address)
         }
-        Text(text = state)
+        Text(
+            when (bluetoothDevice.bondState) {
+                BluetoothDevice.BOND_BONDED -> "Paired"
+                BluetoothDevice.BOND_BONDING -> "Pairing"
+                else -> "Not Paired"
+            }
+        )
     }
 }
-

@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import com.passer.passwatch.core.NewRideScreen
 import com.passer.passwatch.core.RidesScreen
 import com.passer.passwatch.core.SettingsScreen
+import com.passer.passwatch.core.CustomButton
 
 @Composable
 fun MainScreen(navController: NavController) {
@@ -54,27 +55,4 @@ fun MainScreen(navController: NavController) {
     }
 }
 
-// Reusable button function with customizable parameters
-@Composable
-fun CustomButton(
-    text: String,
-    onClick: () -> Unit,
-    backgroundColor: Color = Color(0xFF8A529B),
-    contentColor: Color = Color.White,
 
-    modifier: Modifier = Modifier
-        .fillMaxWidth(0.8f)
-        .height(50.dp)
-) {
-
-    Button(
-        onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor
-        ),
-        modifier = modifier
-    ) {
-        Text(text = text)
-    }
-}

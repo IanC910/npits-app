@@ -39,6 +39,6 @@ fun <T> convertToBytes(value: T): ByteArray {
         is String -> {
             value.toByteArray(Charsets.UTF_8)
         }
-        else -> throw IllegalArgumentException("Unsupported type: ${value::class.java}")
+        else -> throw IllegalArgumentException("Unsupported type: ${value!!::class.java}")
     }
 }

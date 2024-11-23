@@ -1,22 +1,18 @@
 package com.passer.passwatch.newride.presentation
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Button
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.passer.passwatch.core.util.formatTime
 import com.passer.passwatch.newride.domain.NewRideEvent
 import com.passer.passwatch.newride.domain.NewRideState
+import com.passer.passwatch.core.CustomButton
 
 @Composable
 fun NewRideScreen(
@@ -24,75 +20,41 @@ fun NewRideScreen(
     onEvent: (NewRideEvent) -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF282828)) // Apply consistent dark background
+            .padding(16.dp) // Add padding for better layout
     ) {
-        Column(
-            modifier = Modifier.fillMaxHeight(0.15f)
-        ) {
-            if (!state.rideStarted) {
-                Button(onClick = { onEvent(NewRideEvent.StartRide) }) {
-                    Text(text = "Start Ride")
-                }
-
-            } else {
-                Button(onClick = { onEvent(NewRideEvent.StopRide) }) {
-                    Text(text = "Stop Ride")
-                }
-                Text(text = "You are on Ride ${state.rideId}")
-                Text(text = "Elapsed Time: ${formatTime(state.rideTime)}")
-            }
+        // Use CustomButton for the "Start Ride" and "Stop Ride" buttons
+        if (!state.rideStarted) {
+            CustomButton(
+                text = "Start Ride",
+                onClick = { onEvent(NewRideEvent.StartRide) }
+            )
+        } else {
+            CustomButton(
+                text = "Stop Ride",
+                onClick = { onEvent(NewRideEvent.StopRide) }
+            )
         }
 
-        Text(text = "Near Passes", fontSize = 20.sp)
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.4f),
+        Spacer(modifier = Modifier.height(20.dp)) // Add space between button and text
 
-            verticalArrangement = Arrangement.spacedBy(16.dp),
+        // Display ride information with white text for better readability
+        Text(
+            text = "You are on Ride ${state.rideId}",
+            color = Color.White,
+            fontSize = 18.sp,
+            modifier = Modifier.padding(top = 8.dp)
+        )
 
-            ) {
-            items(state.nearPasses) { nearPass ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(text = "Time: ${nearPass.time}")
-                        Text(text = "Latitude: ${nearPass.latitude}")
-                        Text(text = "Longitude: ${nearPass.longitude}")
-                        Text(text = "Distance: ${nearPass.distance}")
-                        Text(text = "Speed: ${nearPass.speed}")
-                    }
-                }
-            }
-        }
-
-        Text(text = "Geo Waypoints", fontSize = 20.sp)
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.4f),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-            items(state.routes) { nearPass ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(text = "Time: ${nearPass.time}")
-                        Text(text = "Latitude: ${nearPass.latitude}")
-                        Text(text = "Longitude: ${nearPass.longitude}")
-                        Text(text = "Speed: ${nearPass.speed}")
-                    }
-                }
-            }
-
-        }
+        Text(
+            text = "Elapsed Time: ${formatTime(state.rideTime)}",
+            color = Color.White,
+            fontSize = 16.sp,
+            modifier = Modifier.padding(top = 4.dp)
+        )
     }
 }
-
-

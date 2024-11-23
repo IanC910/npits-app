@@ -19,7 +19,8 @@ import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.repo.data.Route
 import com.passer.passwatch.core.repo.data.RouteDao
-import com.passer.passwatch.nearpass.data.NearPass
+import com.passer.passwatch.core.util.convertToBytes
+import com.passer.passwatch.core.util.writeToBluetoothGattCharacteristic
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
@@ -75,6 +76,7 @@ class NewRideViewModel(
     private var timerJob: Job? = null
     private var bluetoothGatt: BluetoothGatt? = null
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun onEvent(event: NewRideEvent) {
         when (event) {
             is NewRideEvent.StartRide -> {
@@ -173,6 +175,7 @@ class NewRideViewModel(
         Log.i("NewRideViewModel", "onCleared")
     }
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val locationListener = LocationListener { location ->
         Log.i("NewRideViewModel", "Location changed: $location")
 
@@ -184,9 +187,26 @@ class NewRideViewModel(
             rideId = state.value.rideId
         )
 
+
         viewModelScope.launch {
-            Log.i("NewRideViewModel", "Logging route: $route")
-            routeDao.insertRoute(route)
+            writeToBluetoothGattCharacteristic(
+                bluetoothGatt,
+                UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                UUIDConstants.GPS_LATITUDE.uuid,
+                convertToBytes(location.latitude)
+            )
+            writeToBluetoothGattCharacteristic(
+                bluetoothGatt,
+                UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                UUIDConstants.GPS_LONGITUDE.uuid,
+                convertToBytes(location.longitude)
+            )
+            writeToBluetoothGattCharacteristic(
+                bluetoothGatt,
+                UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                UUIDConstants.GPS_SPEED_MPS.uuid,
+                convertToBytes(location.speed)
+            )
         }
     }
 
@@ -264,43 +284,6 @@ class NewRideViewModel(
                 it.copy(
                     characteristicValue = it.characteristicValue
                             + (characteristic.uuid.toString() to String(value))
-                )
-            }
-
-            // Near pass flag was triggered
-            if (characteristic.uuid.toString() == UUIDConstants.NEAR_PASS_FLAG_CHARACTERISTIC_UUID.uuid.toString()) {
-                Log.i("TelemetryViewModel", "Near pass flag triggered")
-                val lastLocation =
-                    locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-                Log.i("TelemetryViewModel", "Last location: $lastLocation")
-
-                val rideId = state.value.rideId
-                val latitude = lastLocation?.latitude
-                val longitude = lastLocation?.longitude
-                val distance =
-                    state.value.characteristicValue[UUIDConstants.DISTANCE_CHARACTERISTIC_UUID.uuid.toString()]
-                val speed =
-                    state.value.characteristicValue[UUIDConstants.SPEED_CHARACTERISTIC_UUID.uuid.toString()]
-                val time =
-                    state.value.characteristicValue[UUIDConstants.TIME_CHARACTERISTIC_UUID.uuid.toString()]
-
-                val nearPass = NearPass(
-                    rideId = rideId,
-                    latitude = latitude,
-                    longitude = longitude,
-                    distance = distance?.toDouble(),
-                    speed = speed?.toDouble(),
-                    time = System.currentTimeMillis(),
-                )
-
-                viewModelScope.launch {
-                    nearPassDao.insertNearPass(nearPass)
-                }
-                // clear the near pass flag
-                gatt.writeCharacteristic(
-                    characteristic,
-                    ByteArray(0),
-                    BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
                 )
             }
         }

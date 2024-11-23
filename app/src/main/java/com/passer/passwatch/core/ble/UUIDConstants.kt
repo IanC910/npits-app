@@ -1,25 +1,38 @@
 package com.passer.passwatch.core.ble
 
-import com.fasterxml.uuid.Generators
-import com.fasterxml.uuid.impl.NameBasedGenerator
 import java.util.UUID
 
-/* Type 5 UUIDs
-com.passer.passwatch.main.service : 9ce6f88c-0be2-55de-8286-faf078a258fe
-com.passer.passwatch.main.characteristic.near_pass_flag : 44270457-8e75-5fef-a4ad-0ab8a86dfb6b
-com.passer.passwatch.main.characteristic.time : 068e9c09-8581-5594-b46b-7498315cb915
-com.passer.passwatch.main.characteristic.speed : aa53506e-f719-5063-8738-11e01848c73d
-com.passer.passwatch.main.characteristic.distance : 7596a38f-1452-5a3d-9d41-c5ca364c4a74
-com.passer.passwatch.main.characteristic.video_id : d8747d74-9fde-5583-900d-48b20a105eaf
-*/
-
-val uuidGenerator: NameBasedGenerator = Generators.nameBasedGenerator()
-
 enum class UUIDConstants(val uuid: UUID) {
-    SERVICE_UUID(uuidGenerator.generate("com.passer.passwatch.main.service")),
-    NEAR_PASS_FLAG_CHARACTERISTIC_UUID(uuidGenerator.generate("com.passer.passwatch.main.characteristic.near_pass_flag")),
-    TIME_CHARACTERISTIC_UUID(uuidGenerator.generate("com.passer.passwatch.main.characteristic.time")),
-    SPEED_CHARACTERISTIC_UUID(uuidGenerator.generate("com.passer.passwatch.main.characteristic.speed")),
-    DISTANCE_CHARACTERISTIC_UUID(uuidGenerator.generate("com.passer.passwatch.main.characteristic.distance")),
-    VIDEO_ID_CHARACTERISTIC_UUID(uuidGenerator.generate("com.passer.passwatch.main.characteristic.video_id")),
+
+    // Generic Access
+    DEVICE_NAME(UUID.fromString("00002A00-0000-1000-8000-00805F9B34FB")),
+
+    // Get Rides List
+    SERVICE_RIDES_LIST(UUID.fromString("00001900-0000-1000-8000-00805F9B34FB")),
+    RL_REQUEST(UUID.fromString("00001401-0000-1000-8000-00805F9B34FB")),
+    R_VALID(UUID.fromString("00001402-0000-1000-8000-00805F9B34FB")),
+    R_ID(UUID.fromString("00001410-0000-1000-8000-00805F9B34FB")),
+    R_START_UNIX_TIME(UUID.fromString("00001411-0000-1000-8000-00805F9B34FB")),
+    R_END_UNIX_TIME(UUID.fromString("00001412-0000-1000-8000-00805F9B34FB")),
+
+    // Get Near Pass List
+    SERVICE_NEAR_PASS_LIST(UUID.fromString("00002000-0000-1000-8000-00805F9B34FB")),
+    NPL_REQUEST(UUID.fromString("00002001-0000-1000-8000-00805F9B34FB")),
+    NPL_ID(UUID.fromString("00002002-0000-1000-8000-00805F9B34FB")),
+    NP_VALID(UUID.fromString("00002003-0000-1000-8000-00805F9B34FB")),
+    NP_UNIX_TIME(UUID.fromString("00002010-0000-1000-8000-00805F9B34FB")),
+    NP_DISTANCE_CM(UUID.fromString("00002011-0000-1000-8000-00805F9B34FB")),
+    NP_SPEED_MPS(UUID.fromString("00002012-0000-1000-8000-00805F9B34FB")),
+    NP_LATITUDE(UUID.fromString("00002013-0000-1000-8000-00805F9B34FB")),
+    NP_LONGITUDE(UUID.fromString("00002014-0000-1000-8000-00805F9B34FB")),
+
+    // Give GPS Coords
+    SERVICE_GPS_COORDS(UUID.fromString("00002100-0000-1000-8000-00805F9B34FB")),
+    GPS_LATITUDE(UUID.fromString("00002110-0000-1000-8000-00805F9B34FB")),
+    GPS_LONGITUDE(UUID.fromString("00002111-0000-1000-8000-00805F9B34FB")),
+    GPS_SPEED_MPS(UUID.fromString("00002112-0000-1000-8000-00805F9B34FB")),
+
+    // Ride Control
+    SERVICE_RIDE_CONTROL(UUID.fromString("00002200-0000-1000-8000-00805F9B34FB")),
+    RC_CMD(UUID.fromString("00002200-0000-1000-8000-00805F9B34FB"))
 }

@@ -346,7 +346,7 @@ class SettingsViewModel(
                 readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_DISTANCE_CM.uuid)
             }
 
-            if(characteristic.uuid == UUIDConstants.SERVICE_RIDES_LIST.uuid){
+            if(characteristic.uuid == UUIDConstants.R_VALID.uuid){
                 readFromBluetoothGattCharacteristic<Int>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_ID.uuid)
                 readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_START_UNIX_TIME.uuid)
                 readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_END_UNIX_TIME.uuid)

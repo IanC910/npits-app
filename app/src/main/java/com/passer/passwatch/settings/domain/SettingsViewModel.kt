@@ -193,7 +193,7 @@ class SettingsViewModel(
             super.onScanResult(callbackType, result)
             val device = result.device
 
-            if (!state.value.scannedDevices.contains(device)) {
+            if (!state.value.scannedDevices.contains(device) && device.name == "NPITS") {
                 _state.update {
                     it.copy(scannedDevices = _state.value.scannedDevices + device)
                 }
@@ -306,6 +306,8 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     nearPassDao.insertNearPass(localNearPass)
                 }
+                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, 0)
+
             }
 
             if(characteristic.uuid == UUIDConstants.R_ID.uuid){
@@ -326,6 +328,8 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     rideDao.insertRide(localRide)
                 }
+                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, 0)
+
             }
 
         }

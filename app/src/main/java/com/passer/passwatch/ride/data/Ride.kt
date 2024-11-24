@@ -5,9 +5,9 @@ import androidx.room.PrimaryKey
 
 @Entity
 data class Ride(
-    val startTime: Long?,
-    val endTime: Long?,
+    var startTime: Long?,
+    var endTime: Long?,
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    var id: Int = 0,
 )

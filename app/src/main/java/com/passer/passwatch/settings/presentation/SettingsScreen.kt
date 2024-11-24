@@ -76,6 +76,14 @@ fun SettingsScreen(
         }
 
         CustomButton(
+            text = "Sync from Hub " + state.syncStatus,
+            onClick = {
+                onEvent(SettingsEvent.SyncData)
+            }
+        )
+
+        // scan for BLE devices
+        CustomButton(
             text = "Live Telemetry",
             onClick = {
                 navController.navigate(

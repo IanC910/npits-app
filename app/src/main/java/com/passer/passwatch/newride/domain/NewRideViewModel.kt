@@ -20,7 +20,7 @@ import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.repo.data.Route
 import com.passer.passwatch.core.repo.data.RouteDao
 import com.passer.passwatch.core.util.convertToBytes
-import com.passer.passwatch.core.util.writeToBluetoothGattCharacteristic
+import com.passer.passwatch.core.ble.writeToBluetoothGattCharacteristic
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao

@@ -1,6 +1,10 @@
-package com.passer.passwatch.core.util
+package com.passer.passwatch.core.ble
 
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
+import android.util.Log
+import com.passer.passwatch.core.util.convertFromBytes
+import com.passer.passwatch.core.util.convertToBytes
 import java.util.UUID
 
 fun <T> writeToBluetoothGattCharacteristic(
@@ -41,3 +45,33 @@ fun <T> writeToBluetoothGattCharacteristic(
         }
     }
 }
+
+inline fun <reified T> readFromBluetoothGattCharacteristic(
+    bluetoothGatt: BluetoothGatt?,
+    serviceUUID: UUID,
+    characteristicUUID: UUID
+): T? {
+    // Ensure that bluetoothGatt is not null
+    bluetoothGatt?.let {
+        // Get the service using the service UUID
+        val service = bluetoothGatt.getService(serviceUUID)
+
+        if (service != null) {
+            // Get the characteristic using the characteristic UUID
+            val characteristic = service.getCharacteristic(characteristicUUID)
+
+            if (characteristic != null) {
+                // Attempt to read the characteristic
+                bluetoothGatt.readCharacteristic(characteristic)
+            } else {
+                Log.i("BLECharacteristic", "Characteristic with UUID $characteristicUUID not found")
+            }
+        } else {
+            Log.i("BLECharacteristic", "Service with UUID $serviceUUID not found")
+        }
+    } ?: Log.i("BLECharacteristic", "BluetoothGatt is null")
+
+    return null // Return null if any step fails
+}
+
+

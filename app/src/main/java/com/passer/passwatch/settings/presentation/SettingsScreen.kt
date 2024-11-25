@@ -49,7 +49,6 @@ fun SettingsScreen(
                 .padding(bottom = 16.dp)
         )
 
-        // Custom buttons for Save, Start Scan, Stop Scan, and Live Telemetry
         CustomButton(
             text = "Save",
             onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) }
@@ -76,7 +75,15 @@ fun SettingsScreen(
         }
 
         CustomButton(
-            text = "Sync from Hub " + state.syncStatus,
+            text = "Connect to selected device",
+            onClick = {
+                onEvent(SettingsEvent.Connect)
+            }
+        )
+        Text(state.connectionState)
+
+        CustomButton(
+            text = "Sync from Hub: " + state.syncStatus,
             onClick = {
                 onEvent(SettingsEvent.SyncData)
             }

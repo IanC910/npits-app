@@ -9,5 +9,6 @@ sealed interface SettingsEvent {
 
     data object RequestPermissions : SettingsEvent
 
+    data object Connect : SettingsEvent
     data object SyncData : SettingsEvent
 }

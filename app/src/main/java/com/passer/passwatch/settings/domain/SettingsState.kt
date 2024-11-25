@@ -7,5 +7,6 @@ data class SettingsState (
     val newHubMacAddress : String = "",
     val scanning : Boolean = false,
     val scannedDevices : List<BluetoothDevice> = emptyList(),
+    val connectionState : String = "Not Connected",
     val syncStatus : String = "",
 )

@@ -12,7 +12,7 @@ fun <T> writeToBluetoothGattCharacteristic(
     serviceUUID: UUID,
     characteristicUUID: UUID,
     value: T
-) {
+): Int {
     // Ensure that bluetoothGatt is not null
     bluetoothGatt?.let {
         // Get the service using the service UUID
@@ -30,20 +30,22 @@ fun <T> writeToBluetoothGattCharacteristic(
                 characteristic.value = byteArray
 
                 // Write the characteristic
-                val success = bluetoothGatt.writeCharacteristic(characteristic)
-
-                if (success) {
-                    println("Successfully wrote characteristic with UUID: $characteristicUUID")
-                } else {
-                    println("Failed to write characteristic with UUID: $characteristicUUID")
+                val result = bluetoothGatt.writeCharacteristic(characteristic, byteArray, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                println("Write characteristic result: $result")
+                if(result != 0) {
+                    return result
                 }
             } else {
                 println("Characteristic with UUID $characteristicUUID not found")
+                return 1
             }
         } else {
             println("Service with UUID $serviceUUID not found")
+            return 1
         }
     }
+
+    return 0
 }
 
 inline fun <reified T> readFromBluetoothGattCharacteristic(

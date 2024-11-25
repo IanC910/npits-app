@@ -6,7 +6,6 @@ import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
 import android.bluetooth.BluetoothGattCharacteristic
 import android.bluetooth.BluetoothGattDescriptor
-import android.bluetooth.BluetoothGattService
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
@@ -28,8 +27,6 @@ import com.passer.passwatch.nearpass.data.NearPass
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -38,7 +35,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class SettingsViewModel(
     private val applicationContext: Context,
@@ -54,6 +50,8 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(SettingsState())
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
     private val _permissionNeeded = MutableSharedFlow<String>()
+
+    private var bluetoothGatt: BluetoothGatt? = null
 
     val state = combine(_state, _hubMacAddress) { state, hubMacAddress ->
         state.copy(
@@ -129,15 +127,10 @@ class SettingsViewModel(
                 }
             }
 
-            is SettingsEvent.SyncData -> {
-                var bluetoothGatt: BluetoothGatt? = null
-
+            is SettingsEvent.Connect -> {
                 _state.update {
-                    it.copy(
-                        syncStatus = "Starting Sync"
-                    )
+                    it.copy(connectionState = "Connecting...")
                 }
-
                 Log.i("SettingsViewModel", "Connecting to device: ${hubMacAddress.value}")
                 bluetoothManager.adapter?.let { adapter ->
                     try {
@@ -154,35 +147,40 @@ class SettingsViewModel(
                 } ?: run {
                     Log.w("SettingsViewModel", "Bluetooth adapter is null")
                 }
+            }
 
+            is SettingsEvent.SyncData -> {
                 _state.update {
-                    it.copy(
-                        syncStatus = "Syncing Near Passes"
-                    )
+                    it.copy(syncStatus = "Syncing Rides")
                 }
-
-                viewModelScope.launch {
-                    nearPassDao.deleteAllNearPasses()
-                }
-                writeToBluetoothGattCharacteristic(bluetoothGatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NPL_REQUEST.uuid, 1)
-
-
-                _state.update {
-                    it.copy(
-                        syncStatus = "Syncing Rides"
-                    )
-                }
-
                 viewModelScope.launch {
                     rideDao.deleteAllRides()
                 }
-                writeToBluetoothGattCharacteristic(bluetoothGatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.RL_REQUEST.uuid, 1)
+                var result = writeToBluetoothGattCharacteristic(bluetoothGatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.RL_REQUEST.uuid, 1)
+                if(result != 0) {
+                    _state.update {
+                        it.copy(syncStatus = "Syncing rides failed")
+                    }
+                }
 
+                Thread.sleep(1000)
 
                 _state.update {
-                    it.copy(
-                        syncStatus = "Sync Completed!"
-                    )
+                    it.copy(syncStatus = "Syncing Near Passes")
+                }
+                viewModelScope.launch {
+                    nearPassDao.deleteAllNearPasses()
+                }
+                result = writeToBluetoothGattCharacteristic(bluetoothGatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NPL_REQUEST.uuid, 1)
+                if(result != 0) {
+                    _state.update {
+                        it.copy(syncStatus = "Sync near passes failed")
+                    }
+                    return
+                }
+
+                _state.update {
+                    it.copy(syncStatus = "Done")
                 }
             }
         }
@@ -221,8 +219,14 @@ class SettingsViewModel(
                 Log.i("SettingsViewModel", "Connected to device")
                 gatt?.discoverServices()
                 gatt?.requestMtu(200)
+                _state.update {
+                    it.copy(connectionState = "Connected")
+                }
             } else {
                 Log.i("SettingsViewModel", "Disconnected from device")
+                _state.update {
+                    it.copy(connectionState = "Not Connected")
+                }
             }
         }
 
@@ -276,29 +280,31 @@ class SettingsViewModel(
         ) {
             super.onCharacteristicRead(gatt, characteristic, value, status)
 
-            if(characteristic.uuid == UUIDConstants.NPL_ID.uuid){
-                localNearPass.id = convertFromBytes<Int>(value)!!
-                NP_counter++
-            }
-            if(characteristic.uuid == UUIDConstants.NP_UNIX_TIME.uuid){
-                localNearPass.time = convertFromBytes(value)
-                NP_counter++
-            }
-            if(characteristic.uuid == UUIDConstants.NP_LATITUDE.uuid){
-                localNearPass.latitude = convertFromBytes(value)
-                NP_counter++
-            }
-            if(characteristic.uuid == UUIDConstants.NP_LONGITUDE.uuid){
-                localNearPass.longitude = convertFromBytes(value)
-                NP_counter++
-            }
-            if(characteristic.uuid == UUIDConstants.NP_SPEED_MPS.uuid){
-                localNearPass.speed = convertFromBytes(value)
-                NP_counter++
-            }
-            if(characteristic.uuid == UUIDConstants.NP_DISTANCE_CM.uuid){
-                localNearPass.distance = convertFromBytes(value)
-                NP_counter++
+            when (characteristic.uuid) {
+                UUIDConstants.NP_RIDE_ID.uuid -> {
+                    localNearPass.id = convertFromBytes<Int>(value)!!
+                    NP_counter++
+                }
+                UUIDConstants.NP_TIME.uuid -> {
+                    localNearPass.time = convertFromBytes(value)
+                    NP_counter++
+                }
+                UUIDConstants.NP_LATITUDE.uuid -> {
+                    localNearPass.latitude = convertFromBytes(value)
+                    NP_counter++
+                }
+                UUIDConstants.NP_LONGITUDE.uuid -> {
+                    localNearPass.longitude = convertFromBytes(value)
+                    NP_counter++
+                }
+                UUIDConstants.NP_SPEED_MPS.uuid -> {
+                    localNearPass.speed = convertFromBytes(value)
+                    NP_counter++
+                }
+                UUIDConstants.NP_DISTANCE_CM.uuid -> {
+                    localNearPass.distance = convertFromBytes(value)
+                    NP_counter++
+                }
             }
 
             if(NP_counter == 6){
@@ -310,17 +316,19 @@ class SettingsViewModel(
 
             }
 
-            if(characteristic.uuid == UUIDConstants.R_ID.uuid){
-                localRide.id = convertFromBytes<Int>(value)!!
-                R_counter++;
-            }
-            if(characteristic.uuid == UUIDConstants.R_START_UNIX_TIME.uuid){
-                localRide.startTime = convertFromBytes(value)
-                R_counter++;
-            }
-            if(characteristic.uuid == UUIDConstants.R_END_UNIX_TIME.uuid){
-                localRide.endTime = convertFromBytes(value)
-                R_counter++;
+            when (characteristic.uuid) {
+                UUIDConstants.R_ID.uuid -> {
+                    localRide.id = convertFromBytes<Int>(value)!!
+                    R_counter++
+                }
+                UUIDConstants.R_START_TIME.uuid -> {
+                    localRide.startTime = convertFromBytes(value)
+                    R_counter++
+                }
+                UUIDConstants.R_END_TIME.uuid -> {
+                    localRide.endTime = convertFromBytes(value)
+                    R_counter++
+                }
             }
 
             if(R_counter == 3){
@@ -329,9 +337,7 @@ class SettingsViewModel(
                     rideDao.insertRide(localRide)
                 }
                 writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, 0)
-
             }
-
         }
 
         override fun onCharacteristicChanged(
@@ -342,18 +348,18 @@ class SettingsViewModel(
             super.onCharacteristicChanged(gatt, characteristic, value)
 
             if(characteristic.uuid == UUIDConstants.NP_VALID.uuid){
-                readFromBluetoothGattCharacteristic<Int>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NPL_ID.uuid)
-                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_UNIX_TIME.uuid)
+                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_TIME.uuid)
+                readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_DISTANCE_CM.uuid)
+                readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_SPEED_MPS.uuid)
                 readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_LATITUDE.uuid)
                 readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_LONGITUDE.uuid)
-                readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_SPEED_MPS.uuid)
-                readFromBluetoothGattCharacteristic<Double>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_DISTANCE_CM.uuid)
+                readFromBluetoothGattCharacteristic<Int>(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_RIDE_ID.uuid)
             }
 
             if(characteristic.uuid == UUIDConstants.R_VALID.uuid){
                 readFromBluetoothGattCharacteristic<Int>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_ID.uuid)
-                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_START_UNIX_TIME.uuid)
-                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_END_UNIX_TIME.uuid)
+                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_START_TIME.uuid)
+                readFromBluetoothGattCharacteristic<Long>(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_END_TIME.uuid)
             }
         }
 

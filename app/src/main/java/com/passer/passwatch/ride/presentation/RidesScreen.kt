@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -66,12 +69,29 @@ fun RidesScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                Text(
-                    "Rides",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White, // White text for visibility
-                    modifier = Modifier.padding(20.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(
+                        "Rides",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White, // White text for visibility
+                        modifier = Modifier.padding(20.dp)
+                    )
+
+                    Button(
+                        onClick = {},
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8A529B),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.fillMaxSize().padding(20.dp)
+                    ) {
+                        Text(
+                            text = "Sync Rides"
+                        )
+                    }
+                }
             }
 
             items(state.rides) { ride ->

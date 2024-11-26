@@ -36,10 +36,15 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color(0xFF282828))
     ) {
-        // Display current MAC address
-        Text("Current Hub MAC Address: ${state.hubMacAddress}", modifier = Modifier.padding(bottom = 16.dp))
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Selected Hub MAC Address: ${state.hubMacAddress}",
+                modifier = Modifier.padding(bottom = 16.dp))
+        }
 
-        // Input field for new MAC address
         OutlinedTextField(
             value = state.newHubMacAddress,
             onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
@@ -50,29 +55,22 @@ fun SettingsScreen(
         )
 
         CustomButton(
-            text = "Save",
-            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) }
+            text = "Save Manually Entered MAC Address",
+            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) },
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            // Conditional Start/Stop Scan button
-            CustomButton(
-                text = if (state.scanning) "Scanning devices..." else "Scan for devices",
-                onClick = {
-                    if (state.scanning) {
-                        onEvent(SettingsEvent.StopScan)
-                    } else {
-                        onEvent(SettingsEvent.StartScan)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(0.475f)
-            )
-        }
+        CustomButton(
+            text = if (state.scanning) "Scanning devices..." else "Scan for devices",
+            onClick = {
+                if (state.scanning) {
+                    onEvent(SettingsEvent.StopScan)
+                } else {
+                    onEvent(SettingsEvent.StartScan)
+                }
+            },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
         CustomButton(
             text = "Connect to selected device",
@@ -80,16 +78,22 @@ fun SettingsScreen(
                 onEvent(SettingsEvent.Connect)
             }
         )
-        Text(state.connectionState)
+        Text(
+            text = state.connectionState,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
         CustomButton(
-            text = "Sync from Hub: " + state.syncStatus,
+            text = "Sync from Hub",
             onClick = {
                 onEvent(SettingsEvent.SyncData)
             }
         )
+        Text(
+            text = state.syncStatus,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
 
-        // scan for BLE devices
         CustomButton(
             text = "Live Telemetry",
             onClick = {
@@ -99,10 +103,9 @@ fun SettingsScreen(
                     )
                 )
             },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // BLE devices scanning section
         BleScannerResultsBox(
             state = state,
             onSelect = {

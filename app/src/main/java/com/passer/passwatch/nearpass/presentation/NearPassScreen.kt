@@ -1,5 +1,6 @@
 package com.passer.passwatch.nearpass.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
@@ -43,11 +45,14 @@ fun NearPassScreen(
             AddNearPassDialog(state = state, onEvent = onEvent)
         }
 
-        Column {
+        Column (
+          modifier = Modifier.background(Color(0xFF282828))
+        ) {
             Text(
                 "Near Passes for Ride ${state.rideId}",
                 style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
+                color = Color.White
             )
 
             LazyColumn(
@@ -73,7 +78,8 @@ fun NearPassScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete near pass"
+                                contentDescription = "Delete near pass",
+                                tint = Color.White
                             )
                         }
                     }

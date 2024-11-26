@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.sp
 import com.passer.passwatch.core.util.formatTime
 import com.passer.passwatch.newride.domain.NewRideEvent
 import com.passer.passwatch.newride.domain.NewRideState
-import com.passer.passwatch.core.CustomButton
+import com.passer.passwatch.core.WideButton
 
 @Composable
 fun NewRideScreen(
@@ -29,12 +29,12 @@ fun NewRideScreen(
     ) {
         // Use CustomButton for the "Start Ride" and "Stop Ride" buttons
         if (!state.rideStarted) {
-            CustomButton(
+            WideButton(
                 text = "Start Ride",
                 onClick = { onEvent(NewRideEvent.StartRide) }
             )
         } else {
-            CustomButton(
+            WideButton(
                 text = "Stop Ride",
                 onClick = { onEvent(NewRideEvent.StopRide) }
             )

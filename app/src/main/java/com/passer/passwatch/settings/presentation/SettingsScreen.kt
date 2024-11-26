@@ -19,7 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.passer.passwatch.core.CustomButton
+import com.passer.passwatch.core.WideButton
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
 
@@ -41,26 +41,29 @@ fun SettingsScreen(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "Selected Hub MAC Address: ${state.hubMacAddress}",
-                modifier = Modifier.padding(bottom = 16.dp))
+                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
+            )
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
             value = state.newHubMacAddress,
             onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
             label = { Text("Enter new Hub MAC Address") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
+            modifier = Modifier.fillMaxWidth()
         )
 
-        CustomButton(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
             text = "Save Manually Entered MAC Address",
             onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) },
-            modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        CustomButton(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
             text = if (state.scanning) "Scanning devices..." else "Scan for devices",
             onClick = {
                 if (state.scanning) {
@@ -68,33 +71,36 @@ fun SettingsScreen(
                 } else {
                     onEvent(SettingsEvent.StartScan)
                 }
-            },
-            modifier = Modifier.padding(bottom = 16.dp)
+            }
         )
 
-        CustomButton(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
             text = "Connect to selected device",
             onClick = {
                 onEvent(SettingsEvent.Connect)
             }
         )
         Text(
-            text = state.connectionState,
-            modifier = Modifier.padding(bottom = 16.dp)
+            text = state.connectionState
         )
 
-        CustomButton(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
             text = "Sync from Hub",
             onClick = {
                 onEvent(SettingsEvent.SyncData)
             }
         )
         Text(
-            text = state.syncStatus,
-            modifier = Modifier.padding(bottom = 16.dp)
+            text = state.syncStatus
         )
 
-        CustomButton(
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
             text = "Live Telemetry",
             onClick = {
                 navController.navigate(
@@ -102,9 +108,10 @@ fun SettingsScreen(
                         macAddress = state.hubMacAddress,
                     )
                 )
-            },
-            modifier = Modifier.padding(bottom = 16.dp)
+            }
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         BleScannerResultsBox(
             state = state,

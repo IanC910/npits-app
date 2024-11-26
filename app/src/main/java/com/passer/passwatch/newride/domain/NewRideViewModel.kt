@@ -1,11 +1,7 @@
 package com.passer.passwatch.newride.domain
 
 import android.Manifest
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothGatt
-import android.bluetooth.BluetoothGattCallback
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.location.LocationListener
@@ -15,6 +11,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.repo.data.Route
@@ -80,6 +77,22 @@ class NewRideViewModel(
     fun onEvent(event: NewRideEvent) {
         when (event) {
             is NewRideEvent.StartRide -> {
+                if(!BluetoothGattContainer.isConnected()) {
+                    _state.update {
+                        it.copy(
+                            rideStatus = false,
+                            rideStatusMessage = "Connect to an NPITS device first!"
+                        )
+                    }
+                    return
+                }
+                _state.update {
+                    it.copy(
+                        rideStatus = true,
+                        rideStatusMessage = "Ride Started!"
+                    )
+                }
+
                 // Start the timer
                 timerJob?.cancel()
                 timerJob = viewModelScope.launch {
@@ -120,26 +133,6 @@ class NewRideViewModel(
                             rideId = newRideId.toInt()
                         )
                     }
-                }
-
-                // Connect to bluetooth
-                bluetoothGatt?.close()
-
-                Log.i("TelemetryViewModel", "Connecting to device: ${hubMacAddress.value}")
-                bluetoothManager.adapter?.let { adapter ->
-                    try {
-                        val device = adapter.getRemoteDevice(hubMacAddress.value)
-                        bluetoothGatt =
-                            device.connectGatt(applicationContext, true, bluetoothGattCallback)
-
-                    } catch (exception: IllegalArgumentException) {
-                        Log.w(
-                            "TelemetryViewModel",
-                            "Device not found with MAC address: ${hubMacAddress.value}"
-                        )
-                    }
-                } ?: run {
-                    Log.w("TelemetryViewModel", "Bluetooth adapter is null")
                 }
             }
 
@@ -187,103 +180,25 @@ class NewRideViewModel(
             rideId = state.value.rideId
         )
 
-
-        viewModelScope.launch {
-            writeToBluetoothGattCharacteristic(
-                bluetoothGatt,
-                UUIDConstants.SERVICE_GPS_COORDS.uuid,
-                UUIDConstants.GPS_LATITUDE.uuid,
-                convertToBytes(location.latitude)
-            )
-            writeToBluetoothGattCharacteristic(
-                bluetoothGatt,
-                UUIDConstants.SERVICE_GPS_COORDS.uuid,
-                UUIDConstants.GPS_LONGITUDE.uuid,
-                convertToBytes(location.longitude)
-            )
-            writeToBluetoothGattCharacteristic(
-                bluetoothGatt,
-                UUIDConstants.SERVICE_GPS_COORDS.uuid,
-                UUIDConstants.GPS_SPEED_MPS.uuid,
-                convertToBytes(location.speed)
-            )
-        }
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private val bluetoothGattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            super.onConnectionStateChange(gatt, status, newState)
-            Log.i("TelemetryViewModel", "Connection state changed to $newState")
-
-            if (newState == BluetoothGatt.STATE_CONNECTED) {
-                Log.i("TelemetryViewModel", "Connected to device")
-                gatt?.discoverServices()
-                gatt?.requestMtu(200)
-            } else {
-                Log.i("TelemetryViewModel", "Disconnected from device")
-            }
-        }
-
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            super.onServicesDiscovered(gatt, status)
-            Log.i("TelemetryViewModel", "Services discovered")
-
-            for (service in gatt!!.services) {
-                Log.i("TelemetryViewModel", "Service: ${service.uuid}")
-                for (characteristic in service.characteristics) {
-                    Log.i("TelemetryViewModel", "Characteristic: ${characteristic.uuid}")
-
-                    if (characteristic.properties.and(BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
-                        if (!gatt.setCharacteristicNotification(characteristic, true)) {
-                            Log.e(
-                                "TelemetryViewModel",
-                                "Characteristic ${characteristic.uuid} notification set failed"
-                            )
-                        } else {
-                            Log.i(
-                                "TelemetryViewModel",
-                                "Characteristic ${characteristic.uuid} notification set"
-                            )
-
-                            val descriptor =
-                                characteristic.getDescriptor(characteristic.descriptors[0].uuid)
-
-                            if (descriptor != null) {
-                                gatt.writeDescriptor(
-                                    descriptor,
-                                    BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-                                )
-                            } else {
-                                Log.e(
-                                    "TelemetryViewModel",
-                                    "CCCD descriptor not found for characteristic ${characteristic.uuid}"
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-        override fun onCharacteristicChanged(
-            gatt: BluetoothGatt,
-            characteristic: BluetoothGattCharacteristic,
-            value: ByteArray,
-        ) {
-            super.onCharacteristicChanged(gatt, characteristic, value)
-//            Log.i(
-//                "TelemetryViewModel",
-//                "Characteristic ${characteristic.uuid} changed to ${String(value)}"
-//            )
-
-            _state.update {
-                it.copy(
-                    characteristicValue = it.characteristicValue
-                            + (characteristic.uuid.toString() to String(value))
+        if(BluetoothGattContainer.isConnected()) {
+            viewModelScope.launch {
+                writeToBluetoothGattCharacteristic(
+                    BluetoothGattContainer.gatt,
+                    UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                    UUIDConstants.GPS_LATITUDE.uuid,
+                    convertToBytes(location.latitude)
+                )
+                writeToBluetoothGattCharacteristic(
+                    BluetoothGattContainer.gatt,
+                    UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                    UUIDConstants.GPS_LONGITUDE.uuid,
+                    convertToBytes(location.longitude)
+                )
+                writeToBluetoothGattCharacteristic(
+                    BluetoothGattContainer.gatt,
+                    UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                    UUIDConstants.GPS_SPEED_MPS.uuid,
+                    convertToBytes(location.speed)
                 )
             }
         }

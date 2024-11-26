@@ -4,6 +4,9 @@ import com.passer.passwatch.core.repo.data.Route
 import com.passer.passwatch.nearpass.data.NearPass
 
 data class NewRideState(
+    var rideStatus: Boolean = false,
+    var rideStatusMessage: String = "Not currently in a ride",
+
     val rideId: Int = 0,
 
     val rideStarted: Boolean = false,

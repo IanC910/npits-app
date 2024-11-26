@@ -27,7 +27,6 @@ fun NewRideScreen(
             .background(Color(0xFF282828)) // Apply consistent dark background
             .padding(16.dp) // Add padding for better layout
     ) {
-        // Use CustomButton for the "Start Ride" and "Stop Ride" buttons
         if (!state.rideStarted) {
             WideButton(
                 text = "Start Ride",
@@ -40,21 +39,28 @@ fun NewRideScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(20.dp)) // Add space between button and text
-
-        // Display ride information with white text for better readability
-        Text(
-            text = "You are on Ride ${state.rideId}",
-            color = Color.White,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 8.dp)
-        )
+        Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Elapsed Time: ${formatTime(state.rideTime)}",
-            color = Color.White,
-            fontSize = 16.sp,
-            modifier = Modifier.padding(top = 4.dp)
+            text = state.rideStatusMessage
         )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if(state.rideStatus) {
+            Text(
+                text = "You are on Ride ${state.rideId}",
+                color = Color.White,
+                fontSize = 18.sp
+            )
+
+            Spacer(modifier = Modifier.height(4.dp))
+
+            Text(
+                text = "Elapsed Time: ${formatTime(state.rideTime)}",
+                color = Color.White,
+                fontSize = 16.sp
+            )
+        }
     }
 }

@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.passer.passwatch.core.NewRideScreen
 import com.passer.passwatch.core.RidesScreen
@@ -32,7 +33,8 @@ fun MainScreen(navController: NavController) {
     ) {
 
         Text(
-            text = "PassWatch"
+            text = "PassWatch",
+            fontSize = 24.sp
         )
         Text(
             text = "By Passer Technologies"

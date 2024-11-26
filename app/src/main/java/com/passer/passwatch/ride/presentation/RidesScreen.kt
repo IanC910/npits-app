@@ -80,7 +80,7 @@ fun RidesScreen(
                     )
 
                     Button(
-                        onClick = {},
+                        onClick = {onEvent(RideEvent.SyncRides)},
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF8A529B),
                             contentColor = Color.White

@@ -1,5 +1,7 @@
 package com.passer.passwatch.ride.domain
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.ride.data.Ride
@@ -12,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class RideViewModel(
+    private val applicationContext: Context,
     private val rideDao: RideDao,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RideState())
@@ -74,6 +77,11 @@ class RideViewModel(
                         isAddingRide = true
                     )
                 }
+            }
+
+            RideEvent.SyncRides -> {
+                Toast.makeText(applicationContext, "Test", Toast.LENGTH_SHORT).show()
+
             }
         }
     }

@@ -11,4 +11,6 @@ sealed interface RideEvent {
     data object HideDialog : RideEvent
 
     data class DeleteRide(val ride: Ride) : RideEvent
+
+    data object SyncRides : RideEvent
 }

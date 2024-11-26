@@ -24,6 +24,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun NearPassScreen(
@@ -67,7 +70,7 @@ fun NearPassScreen(
                         Column(
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(text = "Time: ${nearPass.time}")
+                            Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
                             Text(text = "Latitude: ${nearPass.latitude}")
                             Text(text = "Longitude: ${nearPass.longitude}")
                             Text(text = "Distance: ${nearPass.distance}")
@@ -87,6 +90,11 @@ fun NearPassScreen(
             }
         }
     }
+}
+
+fun formatTimestamp(timestamp: Long): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(Date(timestamp))
 }
 
 

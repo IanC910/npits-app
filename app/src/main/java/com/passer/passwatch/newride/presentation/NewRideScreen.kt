@@ -24,8 +24,8 @@ fun NewRideScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF282828)) // Apply consistent dark background
-            .padding(16.dp) // Add padding for better layout
+            .background(Color(0xFF282828))
+            .padding(16.dp)
     ) {
         if (!state.rideStarted) {
             WideButton(

@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RideViewModel(db.rideDao) as T
+                    return RideViewModel(applicationContext, db.rideDao) as T
                 }
             }
         }

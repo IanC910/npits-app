@@ -18,6 +18,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.ble.readFromBluetoothGattCharacteristic
 import com.passer.passwatch.core.ble.writeToBluetoothGattCharacteristic
@@ -28,6 +29,7 @@ import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -144,8 +146,7 @@ class SettingsViewModel(
                 bluetoothManager.adapter?.let { adapter ->
                     try {
                         val device = adapter.getRemoteDevice(hubMacAddress.value)
-                        bluetoothGatt =
-                            device.connectGatt(applicationContext, true, bluetoothGattCallback)
+                        bluetoothGatt = device.connectGatt(applicationContext, true, bluetoothGattCallback)
 
                     } catch (exception: IllegalArgumentException) {
                         Log.w(
@@ -159,12 +160,14 @@ class SettingsViewModel(
                 } ?: run {
                     Log.w("SettingsViewModel", "Bluetooth adapter is null")
                 }
+
+                BluetoothGattContainer.gatt = bluetoothGatt
             }
 
             is SettingsEvent.SyncData -> {
-                if(hubMacAddress.value == "") {
+                if(!BluetoothGattContainer.isConnected()) {
                     _state.update {
-                        it.copy(syncStatus = "Select a device first!")
+                        it.copy(syncStatus = "Connect to a device first!")
                     }
                     return
                 }

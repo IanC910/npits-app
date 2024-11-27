@@ -22,6 +22,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
+import com.passer.passwatch.ride.presentation.formatTimestamp
 
 @Composable
 fun NearPassScreen(
@@ -62,7 +63,7 @@ fun NearPassScreen(
                         Column(
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(text = "Time: ${nearPass.time}")
+                            Text(text = "Time: ${formatTimestamp(nearPass.time!!)}")
                             Text(text = "Latitude: ${nearPass.latitude}")
                             Text(text = "Longitude: ${nearPass.longitude}")
                             Text(text = "Distance: ${nearPass.distance}")

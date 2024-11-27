@@ -75,6 +75,8 @@ class TelemetryViewModel(
 
     @SuppressLint("MissingPermission")
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
+        var characteristics: List<BluetoothGattCharacteristic> = emptyList()
+
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
             Log.i("TelemetryViewModel", "Connection state changed to $newState")
@@ -99,42 +101,81 @@ class TelemetryViewModel(
                 )
             }
 
+            characteristics = emptyList()
+
             for (service in gatt!!.services) {
                 Log.i("TelemetryViewModel", "Service: ${service.uuid}")
                 for (characteristic in service.characteristics) {
                     Log.i("TelemetryViewModel", "Characteristic: ${characteristic.uuid}")
 
                     if (characteristic.properties.and(BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
-                        if (!gatt.setCharacteristicNotification(characteristic, true)) {
-                            Log.e(
-                                "TelemetryViewModel",
-                                "Characteristic ${characteristic.uuid} notification set failed"
-                            )
-                        } else {
-                            Log.i(
-                                "TelemetryViewModel",
-                                "Characteristic ${characteristic.uuid} notification set"
-                            )
-
-                            val descriptor = characteristic.getDescriptor(characteristic.descriptors[0].uuid)
-
-                            if (descriptor != null) {
-                                gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-                            } else {
-                                Log.e(
-                                    "TelemetryViewModel",
-                                    "CCCD descriptor not found for characteristic ${characteristic.uuid}"
-                                )
-                            }
-                        }
+                        characteristics += characteristic
                     }
-
-                    if (characteristic.properties.and(BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
-                        gatt.readCharacteristic(characteristic)
-                    }
-
                 }
             }
+
+            subscribeToCharacteristics(gatt)
+        }
+
+        private fun subscribeToCharacteristics(gatt: BluetoothGatt) {
+            if (characteristics.isEmpty()) {
+                Log.i("TelemetryViewModel", "reading all characteristics")
+                for (service in gatt.services) {
+                    for (characteristic in service.characteristics) {
+                        Log.i("TelemetryViewModel", "Characteristic: ${characteristic.uuid}")
+
+                        if (characteristic.properties.and(BluetoothGattCharacteristic.PROPERTY_READ) != 0) {
+                            Log.i(
+                                "TelemetryViewModel",
+                                "Characteristic ${characteristic.uuid} read"
+                            )
+                            val ret = gatt.readCharacteristic(characteristic)
+                            Log.i("Telemetry ViewModel", "read ret is $ret for ${characteristic.uuid}")
+                        }
+
+                    }
+                }
+                return;
+            }
+
+            val characteristic: BluetoothGattCharacteristic = characteristics.last()
+
+            if (!gatt.setCharacteristicNotification(characteristic, true)) {
+                Log.e(
+                    "TelemetryViewModel",
+                    "Characteristic ${characteristic.uuid} notification set failed"
+                )
+            } else {
+                characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
+
+                Log.i(
+                    "TelemetryViewModel",
+                    "Characteristic ${characteristic.uuid} notification set"
+                )
+
+                val descriptor = characteristic.getDescriptor(characteristic.descriptors[0].uuid)
+
+                if (descriptor != null) {
+                    val ret = gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
+                    Log.i("TelemetryViewModel", "Write descriptor returned $ret, ${characteristics.size} elements left to process")
+
+                } else {
+                    Log.e(
+                        "TelemetryViewModel",
+                        "CCCD descriptor not found for characteristic ${characteristic.uuid}"
+                    )
+                }
+            }
+        }
+
+        override fun onDescriptorWrite(
+            gatt: BluetoothGatt?,
+            descriptor: BluetoothGattDescriptor?,
+            status: Int
+        ) {
+            super.onDescriptorWrite(gatt, descriptor, status)
+            characteristics = characteristics.dropLast(1)
+            subscribeToCharacteristics(gatt!!)
         }
 
         override fun onCharacteristicChanged(
@@ -150,7 +191,7 @@ class TelemetryViewModel(
             _state.update {
                 it.copy(
                     characteristicValue = it.characteristicValue
-                            + (characteristic.uuid.toString() to String(value))
+                            + (characteristic.uuid.toString() to value.contentToString())
                 )
             }
         }
@@ -174,7 +215,7 @@ class TelemetryViewModel(
             _state.update {
                 it.copy(
                     characteristicValue = it.characteristicValue
-                            + (characteristic.uuid.toString() to String(value))
+                            + (characteristic.uuid.toString() to value.contentToString())
                 )
             }
         }

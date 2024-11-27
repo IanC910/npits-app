@@ -51,9 +51,10 @@ inline fun <reified T> convertFromBytes(bytes: ByteArray?): T? {
     if (bytes == null) return null
     return try {
         when (T::class) {
-            Int::class -> ByteBuffer.wrap(bytes).int as T
-            Float::class -> ByteBuffer.wrap(bytes).float as T
-            Double::class -> ByteBuffer.wrap(bytes).double as T
+            Int::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).int as T
+            Float::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).float as T
+            Double::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).double as T
+            Long::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).long as T
             String::class -> String(bytes) as T
             ByteArray::class -> bytes as T
             else -> throw IllegalArgumentException("Unsupported conversion type: ${T::class}")

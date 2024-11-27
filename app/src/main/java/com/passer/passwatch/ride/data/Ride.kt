@@ -8,6 +8,6 @@ data class Ride(
     var startTime: Long?,
     var endTime: Long?,
 
-    @PrimaryKey(autoGenerate = true)
+    @PrimaryKey(autoGenerate = false)
     var id: Int = 0,
 )

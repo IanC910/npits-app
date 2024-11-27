@@ -31,7 +31,7 @@ fun <T> writeToBluetoothGattCharacteristic(
 
                 // Write the characteristic
                 val result = bluetoothGatt.writeCharacteristic(characteristic, byteArray, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
-                println("Write characteristic result: $result")
+                println("Write characteristic result: $result for characteristic with UUID $characteristicUUID")
                 if(result != 0) {
                     return result
                 }

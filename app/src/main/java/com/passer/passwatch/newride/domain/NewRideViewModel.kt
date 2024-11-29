@@ -186,20 +186,29 @@ class NewRideViewModel(
                     BluetoothGattContainer.gatt,
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_LATITUDE.uuid,
-                    convertToBytes(location.latitude)
+                    location.latitude
                 )
+
+                Thread.sleep(1000)
+
                 writeToBluetoothGattCharacteristic(
                     BluetoothGattContainer.gatt,
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_LONGITUDE.uuid,
-                    convertToBytes(location.longitude)
+                    location.longitude
                 )
+
+                Thread.sleep(1000)
+
                 writeToBluetoothGattCharacteristic(
                     BluetoothGattContainer.gatt,
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_SPEED_MPS.uuid,
-                    convertToBytes(location.speed)
+                    location.speed.toInt()
                 )
+
+                Thread.sleep(1000)
+
             }
         }
     }

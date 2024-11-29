@@ -20,16 +20,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
-import com.passer.passwatch.core.ble.readFromBluetoothGattCharacteristic
 import com.passer.passwatch.core.ble.writeToBluetoothGattCharacteristic
 import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.util.convertFromBytes
+import com.passer.passwatch.core.util.convertToBytes
 import com.passer.passwatch.nearpass.data.NearPass
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -184,7 +183,7 @@ class SettingsViewModel(
                         bluetoothGatt,
                         UUIDConstants.SERVICE_RIDES_LIST.uuid,
                         UUIDConstants.RL_REQUEST.uuid,
-                        1
+                        convertToBytes(1)
                     )
                 }
             }
@@ -259,7 +258,7 @@ class SettingsViewModel(
                 _state.update {
                     it.copy(connectionState = "Connected!")
                 }
-                return;
+                return
             }
 
             val characteristic: BluetoothGattCharacteristic = characteristics.last()
@@ -320,7 +319,7 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     nearPassDao.insertNearPass(localNearPass)
                 }
-                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, 0)
+                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, convertToBytes(0))
             }
 
             if(characteristic.uuid == UUIDConstants.R_VALID.uuid && convertFromBytes<Int>(value) == 1) {
@@ -329,7 +328,7 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     rideDao.insertRide(localRide)
                 }
-                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, 0)
+                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, convertToBytes(0))
             }
 
             if(characteristic.uuid == UUIDConstants.RL_REQUEST.uuid && convertFromBytes<Int>(value) == 0) {
@@ -348,7 +347,7 @@ class SettingsViewModel(
                         bluetoothGatt,
                         UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid,
                         UUIDConstants.NPL_REQUEST.uuid,
-                        1
+                        convertToBytes(1)
                     )
                 }
             }
@@ -390,6 +389,17 @@ class SettingsViewModel(
                     localRide.endTime = convertFromBytes<Long>(value)?.times(1000)
                 }
             }
+        }
+
+        override fun onCharacteristicWrite(
+            gatt: BluetoothGatt?,
+            characteristic: BluetoothGattCharacteristic?,
+            status: Int
+        ) {
+            super.onCharacteristicWrite(gatt, characteristic, status)
+            Log.i("SettingsViewModel", "Characteristic ${characteristic?.uuid} written")
+            BluetoothGattContainer.removeLast()
+            BluetoothGattContainer.flush()
         }
     }
 }

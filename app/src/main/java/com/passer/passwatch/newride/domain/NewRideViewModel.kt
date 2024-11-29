@@ -17,7 +17,6 @@ import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.repo.data.Route
 import com.passer.passwatch.core.repo.data.RouteDao
 import com.passer.passwatch.core.util.convertToBytes
-import com.passer.passwatch.core.ble.writeToBluetoothGattCharacteristic
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
@@ -77,7 +76,7 @@ class NewRideViewModel(
     fun onEvent(event: NewRideEvent) {
         when (event) {
             is NewRideEvent.StartRide -> {
-                if(!BluetoothGattContainer.isConnected()) {
+                if (!BluetoothGattContainer.isConnected()) {
                     _state.update {
                         it.copy(
                             rideStatus = false,
@@ -180,35 +179,30 @@ class NewRideViewModel(
             rideId = state.value.rideId
         )
 
-        if(BluetoothGattContainer.isConnected()) {
+        if (BluetoothGattContainer.isConnected()) {
             viewModelScope.launch {
-                writeToBluetoothGattCharacteristic(
-                    BluetoothGattContainer.gatt,
+
+                BluetoothGattContainer.clear()
+
+                BluetoothGattContainer.emplace(
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_LATITUDE.uuid,
-                    location.latitude
+                    convertToBytes(location.latitude)
                 )
 
-                Thread.sleep(1000)
-
-                writeToBluetoothGattCharacteristic(
-                    BluetoothGattContainer.gatt,
+                BluetoothGattContainer.emplace(
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_LONGITUDE.uuid,
-                    location.longitude
+                    convertToBytes(location.longitude)
                 )
 
-                Thread.sleep(1000)
-
-                writeToBluetoothGattCharacteristic(
-                    BluetoothGattContainer.gatt,
+                BluetoothGattContainer.emplace(
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_SPEED_MPS.uuid,
-                    location.speed.toInt()
+                    convertToBytes(location.speed.toInt())
                 )
 
-                Thread.sleep(1000)
-
+                BluetoothGattContainer.flush()
             }
         }
     }

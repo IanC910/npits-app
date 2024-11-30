@@ -70,7 +70,6 @@ class NewRideViewModel(
 
 
     private var timerJob: Job? = null
-    private var bluetoothGatt: BluetoothGatt? = null
 
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     fun onEvent(event: NewRideEvent) {
@@ -91,6 +90,9 @@ class NewRideViewModel(
                         rideStatusMessage = "Ride Started!"
                     )
                 }
+
+                BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(1))
+                BluetoothGattContainer.flush()
 
                 // Start the timer
                 timerJob?.cancel()
@@ -137,8 +139,10 @@ class NewRideViewModel(
 
             is NewRideEvent.StopRide -> {
                 timerJob?.cancel()
-                bluetoothGatt?.close()
                 locationManager.removeUpdates(locationListener)
+
+                BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(0))
+                BluetoothGattContainer.flush()
 
                 viewModelScope.launch {
                     rideDao.updateRideEndTime(state.value.rideId, System.currentTimeMillis())

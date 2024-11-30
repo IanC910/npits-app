@@ -106,7 +106,7 @@ class NewRideViewModel(
                 }
 
                 locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER,
+                    LocationManager.NETWORK_PROVIDER,
                     10000,
                     0.0001f,
                     locationListener
@@ -180,8 +180,9 @@ class NewRideViewModel(
         )
 
         if (BluetoothGattContainer.isConnected()) {
-            viewModelScope.launch {
+            Log.i("NewRideViewModel", "Sending location to device: $location")
 
+            viewModelScope.launch {
                 BluetoothGattContainer.clear()
 
                 BluetoothGattContainer.emplace(
@@ -204,6 +205,8 @@ class NewRideViewModel(
 
                 BluetoothGattContainer.flush()
             }
+        }else{
+            Log.i("NewRideViewModel", "No GATT connection, cannot update location")
         }
     }
 }

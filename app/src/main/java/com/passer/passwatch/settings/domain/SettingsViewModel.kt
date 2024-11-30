@@ -20,7 +20,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
-import com.passer.passwatch.core.ble.writeToBluetoothGattCharacteristic
 import com.passer.passwatch.core.repo.UserPreferencesRepository
 import com.passer.passwatch.core.util.convertFromBytes
 import com.passer.passwatch.core.util.convertToBytes
@@ -179,12 +178,13 @@ class SettingsViewModel(
                     withContext(Dispatchers.IO) {
                         rideDao.deleteAllRides() // Suspend until deletion is complete
                     }
-                    writeToBluetoothGattCharacteristic( // Now safe to write
-                        bluetoothGatt,
-                        UUIDConstants.SERVICE_RIDES_LIST.uuid,
+
+                    BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDES_LIST.uuid,
                         UUIDConstants.RL_REQUEST.uuid,
                         convertToBytes(1)
                     )
+
+                    BluetoothGattContainer.flush()
                 }
             }
         }
@@ -319,7 +319,8 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     nearPassDao.insertNearPass(localNearPass)
                 }
-                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, convertToBytes(0))
+                BluetoothGattContainer.emplace(UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, convertToBytes(0))
+                BluetoothGattContainer.flush()
             }
 
             if(characteristic.uuid == UUIDConstants.R_VALID.uuid && convertFromBytes<Int>(value) == 1) {
@@ -328,7 +329,9 @@ class SettingsViewModel(
                 viewModelScope.launch {
                     rideDao.insertRide(localRide)
                 }
-                writeToBluetoothGattCharacteristic(gatt, UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, convertToBytes(0))
+
+                BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, convertToBytes(0))
+                BluetoothGattContainer.flush()
             }
 
             if(characteristic.uuid == UUIDConstants.RL_REQUEST.uuid && convertFromBytes<Int>(value) == 0) {
@@ -343,12 +346,12 @@ class SettingsViewModel(
                         nearPassDao.deleteAllNearPasses()
                     }
 
-                    writeToBluetoothGattCharacteristic(
-                        bluetoothGatt,
-                        UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid,
+                    BluetoothGattContainer.emplace(UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid,
                         UUIDConstants.NPL_REQUEST.uuid,
                         convertToBytes(1)
                     )
+
+                    BluetoothGattContainer.flush()
                 }
             }
 

@@ -13,4 +13,5 @@ sealed interface RideEvent {
     data class DeleteRide(val ride: Ride) : RideEvent
 
     data object SyncRides : RideEvent
+    data object ExportCSV : RideEvent
 }

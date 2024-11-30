@@ -70,13 +70,14 @@ fun RidesScreen(
         ) {
             item {
                 Row(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
                 ) {
                     Text(
                         "Rides",
                         style = MaterialTheme.typography.headlineLarge,
                         color = Color.White,
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(10.dp)
                     )
 
                     Button(
@@ -85,10 +86,23 @@ fun RidesScreen(
                             containerColor = Color(0xFF8A529B),
                             contentColor = Color.White
                         ),
-                        modifier = Modifier.fillMaxSize().padding(20.dp)
+                        modifier = Modifier.padding(10.dp)
                     ) {
                         Text(
                             text = "Sync Rides"
+                        )
+                    }
+
+                    Button(
+                        onClick = {onEvent(RideEvent.ExportCSV)},
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8A529B),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(10.dp)
+                    ){
+                        Text(
+                            text = "Export CSV"
                         )
                     }
                 }

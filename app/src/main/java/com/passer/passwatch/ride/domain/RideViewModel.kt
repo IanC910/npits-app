@@ -85,7 +85,6 @@ class RideViewModel(
             }
 
             RideEvent.SyncRides -> {
-
                 if(!BluetoothGattContainer.isConnected()) {
                     Toast.makeText(applicationContext, "Connect to a device first!", Toast.LENGTH_LONG).show()
                     return
@@ -107,6 +106,10 @@ class RideViewModel(
 
                     BluetoothGattContainer.flush()
                 }
+            }
+
+            RideEvent.ExportCSV -> {
+
             }
         }
     }

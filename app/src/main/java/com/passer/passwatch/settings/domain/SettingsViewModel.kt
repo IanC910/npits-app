@@ -144,7 +144,7 @@ class SettingsViewModel(
                 bluetoothManager.adapter?.let { adapter ->
                     try {
                         val device = adapter.getRemoteDevice(hubMacAddress.value)
-                        bluetoothGatt = device.connectGatt(applicationContext, true, bluetoothGattCallback)
+                        BluetoothGattContainer.gatt = device.connectGatt(applicationContext, true, bluetoothGattCallback)
 
                     } catch (exception: IllegalArgumentException) {
                         Log.w(
@@ -158,8 +158,6 @@ class SettingsViewModel(
                 } ?: run {
                     Log.w("SettingsViewModel", "Bluetooth adapter is null")
                 }
-
-                BluetoothGattContainer.gatt = bluetoothGatt
             }
 
             is SettingsEvent.SyncData -> {
@@ -210,7 +208,6 @@ class SettingsViewModel(
 
     @SuppressLint("MissingPermission")
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
-        var characteristics: List<BluetoothGattCharacteristic> = emptyList()
 
         private var localNearPass = NearPass(0.0,0.0,0.0,0.0,0,0)
         private var localRide = Ride(0,0,0)
@@ -237,59 +234,20 @@ class SettingsViewModel(
             super.onServicesDiscovered(gatt, status)
             Log.i("SettingsViewModel", "Services discovered")
 
-            characteristics = emptyList()
+            BluetoothGattContainer.clearDescriptors()
 
             for (service in gatt!!.services) {
-                Log.i("TelemetryViewModel", "Service: ${service.uuid}")
+                Log.i("SettingsViewModel", "Service: ${service.uuid}")
                 for (characteristic in service.characteristics) {
-                    Log.i("TelemetryViewModel", "Characteristic: ${characteristic.uuid}")
+                    Log.i("SettingsViewModel", "Characteristic: ${characteristic.uuid}")
 
                     if (characteristic.properties.and(BluetoothGattCharacteristic.PROPERTY_NOTIFY) != 0) {
-                        characteristics += characteristic
+                        BluetoothGattContainer.emplaceDescriptor(characteristic)
                     }
                 }
             }
 
-            subscribeToCharacteristics(gatt)
-        }
-
-        private fun subscribeToCharacteristics(gatt: BluetoothGatt) {
-            if (characteristics.isEmpty()) {
-                _state.update {
-                    it.copy(connectionState = "Connected!")
-                }
-                return
-            }
-
-            val characteristic: BluetoothGattCharacteristic = characteristics.last()
-
-            if (!gatt.setCharacteristicNotification(characteristic, true)) {
-                Log.e(
-                    "TelemetryViewModel",
-                    "Characteristic ${characteristic.uuid} notification set failed"
-                )
-            } else {
-                characteristic.writeType = BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT
-
-                Log.i(
-                    "TelemetryViewModel",
-                    "Characteristic ${characteristic.uuid} notification set"
-                )
-
-                val descriptor = characteristic.getDescriptor(characteristic.descriptors[0].uuid)
-
-                if (descriptor != null) {
-                    val ret = gatt.writeDescriptor(descriptor, BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE)
-
-                    Log.i("TelemetryViewModel", "Write descriptor returned $ret, ${characteristics.size} elements left to process")
-
-                } else {
-                    Log.e(
-                        "TelemetryViewModel",
-                        "CCCD descriptor not found for characteristic ${characteristic.uuid}"
-                    )
-                }
-            }
+            BluetoothGattContainer.flushDescriptors()
         }
 
         override fun onDescriptorWrite(
@@ -298,8 +256,15 @@ class SettingsViewModel(
             status: Int
         ) {
             super.onDescriptorWrite(gatt, descriptor, status)
-            characteristics = characteristics.dropLast(1)
-            subscribeToCharacteristics(gatt!!)
+            BluetoothGattContainer.removeLastDescriptor()
+
+            if(BluetoothGattContainer.isDescriptorQueueEmpty()){
+                _state.update {
+                    it.copy(connectionState = "Connected!")
+                }
+            }else{
+                BluetoothGattContainer.flushDescriptors()
+            }
         }
 
         override fun onCharacteristicChanged(

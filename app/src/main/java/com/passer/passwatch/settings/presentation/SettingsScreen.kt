@@ -88,15 +88,15 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        WideButton(
-            text = "Sync from Hub",
-            onClick = {
-                onEvent(SettingsEvent.SyncData)
-            }
-        )
-        Text(
-            text = state.syncStatus
-        )
+//        WideButton(
+//            text = "Sync from Hub",
+//            onClick = {
+//                onEvent(SettingsEvent.SyncData)
+//            }
+//        )
+//        Text(
+//            text = state.syncStatus
+//        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

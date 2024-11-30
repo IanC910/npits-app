@@ -15,6 +15,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -161,29 +162,29 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.SyncData -> {
-                if(!BluetoothGattContainer.isConnected()) {
-                    _state.update {
-                        it.copy(syncStatus = "Connect to a device first!")
-                    }
-                    return
-                }
-
-                _state.update {
-                    it.copy(syncStatus = "Syncing Rides")
-                }
-
-                viewModelScope.launch {
-                    withContext(Dispatchers.IO) {
-                        rideDao.deleteAllRides() // Suspend until deletion is complete
-                    }
-
-                    BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDES_LIST.uuid,
-                        UUIDConstants.RL_REQUEST.uuid,
-                        convertToBytes(1)
-                    )
-
-                    BluetoothGattContainer.flush()
-                }
+//                if(!BluetoothGattContainer.isConnected()) {
+//                    _state.update {
+//                        it.copy(syncStatus = "Connect to a device first!")
+//                    }
+//                    return
+//                }
+//
+//                _state.update {
+//                    it.copy(syncStatus = "Syncing Rides")
+//                }
+//
+//                viewModelScope.launch {
+//                    withContext(Dispatchers.IO) {
+//                        rideDao.deleteAllRides() // Suspend until deletion is complete
+//                    }
+//
+//                    BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDES_LIST.uuid,
+//                        UUIDConstants.RL_REQUEST.uuid,
+//                        convertToBytes(1)
+//                    )
+//
+//                    BluetoothGattContainer.flush()
+//                }
             }
         }
     }
@@ -302,11 +303,12 @@ class SettingsViewModel(
 
             if(characteristic.uuid == UUIDConstants.RL_REQUEST.uuid && convertFromBytes<Int>(value) == 0) {
                 viewModelScope.launch {
-                    Thread.sleep(3000)
+                    Thread.sleep(1000)
 
-                    _state.update {
-                        it.copy(syncStatus = "Syncing Near Passes")
-                    }
+//                    _state.update {
+//                        it.copy(syncStatus = "Syncing Near Passes")
+//                    }
+                    Toast.makeText(applicationContext, "Syncing Near Passes", Toast.LENGTH_SHORT).show()
 
                     withContext(Dispatchers.IO) {
                         nearPassDao.deleteAllNearPasses()
@@ -322,8 +324,11 @@ class SettingsViewModel(
             }
 
             if(characteristic.uuid == UUIDConstants.NPL_REQUEST.uuid && convertFromBytes<Int>(value) == 0) {
-                _state.update {
-                    it.copy(syncStatus = "Sync Done!")
+//                _state.update {
+//                    it.copy(syncStatus = "Sync Done!")
+//                }
+                viewModelScope.launch {
+                    Toast.makeText(applicationContext, "Sync Done!", Toast.LENGTH_SHORT).show()
                 }
             }
 

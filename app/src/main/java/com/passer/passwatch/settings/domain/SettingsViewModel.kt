@@ -226,6 +226,7 @@ class SettingsViewModel(
                 _state.update {
                     it.copy(connectionState = "Disconnected")
                 }
+                BluetoothGattContainer.disconnect()
             }
         }
 

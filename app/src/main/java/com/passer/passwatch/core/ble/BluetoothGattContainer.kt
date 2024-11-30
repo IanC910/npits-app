@@ -15,6 +15,14 @@ object BluetoothGattContainer {
         return gatt != null
     }
 
+    fun disconnect() {
+        gatt?.disconnect()
+        gatt?.close()
+        gatt = null
+        sendQueue.clear()
+        sendDescriptorQueue.clear()
+    }
+
     fun emplace(service : UUID, characteristic : UUID, value : ByteArray) {
         sendQueue.add(Triple(service, characteristic, value))
     }

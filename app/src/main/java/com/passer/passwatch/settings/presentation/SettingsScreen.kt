@@ -47,21 +47,21 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(
-            value = state.newHubMacAddress,
-            onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
-            label = { Text("Enter new Hub MAC Address") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        WideButton(
-            text = "Save Manually Entered MAC Address",
-            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) },
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
+//        OutlinedTextField(
+//            value = state.newHubMacAddress,
+//            onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
+//            label = { Text("Enter new Hub MAC Address") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        WideButton(
+//            text = "Save Manually Entered MAC Address",
+//            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) },
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
 
         WideButton(
             text = if (state.scanning) "Scanning devices..." else "Scan for devices",
@@ -100,18 +100,18 @@ fun SettingsScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        WideButton(
-            text = "Live Telemetry",
-            onClick = {
-                navController.navigate(
-                    com.passer.passwatch.core.TelemetryScreen(
-                        macAddress = state.hubMacAddress,
-                    )
-                )
-            }
-        )
+//        WideButton(
+//            text = "Live Telemetry",
+//            onClick = {
+//                navController.navigate(
+//                    com.passer.passwatch.core.TelemetryScreen(
+//                        macAddress = state.hubMacAddress,
+//                    )
+//                )
+//            }
+//        )
 
-        Spacer(modifier = Modifier.height(16.dp))
+//        Spacer(modifier = Modifier.height(16.dp))
 
         BleScannerResultsBox(
             state = state,

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -14,6 +15,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -62,16 +65,47 @@ fun RidesScreen(
             contentPadding = padding,
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFF282828)), // Apply consistent dark background
+                .background(Color(0xFF282828)),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                Text(
-                    "Rides",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = Color.White, // White text for visibility
-                    modifier = Modifier.padding(20.dp)
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceAround
+                ) {
+                    Text(
+                        "Rides",
+                        style = MaterialTheme.typography.headlineLarge,
+                        color = Color.White,
+                        modifier = Modifier.padding(10.dp)
+                    )
+
+                    Button(
+                        onClick = {onEvent(RideEvent.SyncRides)},
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8A529B),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(10.dp)
+                    ) {
+                        Text(
+                            text = "Sync Rides"
+                        )
+                    }
+
+                    Button(
+                        onClick = {onEvent(RideEvent.ExportCSV)},
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF8A529B),
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.padding(10.dp)
+                    ){
+                        Text(
+                            text = "Export CSV"
+                        )
+                    }
+                }
             }
 
             items(state.rides) { ride ->
@@ -81,9 +115,9 @@ fun RidesScreen(
                     Column(
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(text = "Ride #${ride.id}", fontSize = 20.sp, color = Color.White) // White text
-                        Text(text = "Start Time: ${ride.startTime?.let { formatTimestamp(it) }}", color = Color.White) // White text
-                        Text(text = "End Time: ${ride.endTime?.let { formatTimestamp(it) }}", color = Color.White) // White text
+                        Text(text = "Ride #${ride.id}", fontSize = 20.sp, color = Color.White)
+                        Text(text = "Start Time: ${ride.startTime?.let { formatTimestamp(it) }}", color = Color.White)
+                        Text(text = "End Time: ${ride.endTime?.let { formatTimestamp(it) }}", color = Color.White)
                     }
                     IconButton(onClick = {
                         navController.navigate(
@@ -95,7 +129,7 @@ fun RidesScreen(
                         Icon(
                             imageVector = Icons.Default.LocationOn,
                             contentDescription = "View Map",
-                            tint = Color.White // White icon for visibility
+                            tint = Color.White
                         )
                     }
                     IconButton(onClick = {
@@ -108,7 +142,7 @@ fun RidesScreen(
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "View Near Passes",
-                            tint = Color.White // White icon for visibility
+                            tint = Color.White
                         )
                     }
                     IconButton(onClick = {
@@ -117,7 +151,7 @@ fun RidesScreen(
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Delete ride",
-                            tint = Color.White // White icon for visibility
+                            tint = Color.White
                         )
                     }
                 }
@@ -126,7 +160,6 @@ fun RidesScreen(
     }
 }
 
-// Utility function to format timestamp
 fun formatTimestamp(timestamp: Long): String {
     val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
     return dateFormat.format(Date(timestamp))

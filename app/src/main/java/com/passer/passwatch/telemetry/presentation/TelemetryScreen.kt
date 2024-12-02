@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.passer.passwatch.core.CustomButton
+import com.passer.passwatch.core.WideButton
 import com.passer.passwatch.telemetry.domain.TelemetryEvent
 import com.passer.passwatch.telemetry.domain.TelemetryState
 
@@ -39,7 +39,7 @@ fun TelemetryScreen(
         )
 
         // CustomButton for device connection
-        CustomButton(
+        WideButton(
             text = "Connect to Device",
             onClick = { onEvent(TelemetryEvent.ConnectDevice) }
         )

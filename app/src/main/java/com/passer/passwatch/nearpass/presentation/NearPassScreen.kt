@@ -1,5 +1,6 @@
 package com.passer.passwatch.nearpass.presentation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +20,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import com.passer.passwatch.ride.presentation.formatTimestamp
 
 @Composable
 fun NearPassScreen(
@@ -43,11 +49,14 @@ fun NearPassScreen(
             AddNearPassDialog(state = state, onEvent = onEvent)
         }
 
-        Column {
+        Column (
+          modifier = Modifier.background(Color(0xFF282828))
+        ) {
             Text(
                 "Near Passes for Ride ${state.rideId}",
                 style = MaterialTheme.typography.headlineLarge,
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
+                color = Color.White
             )
 
             LazyColumn(
@@ -62,7 +71,7 @@ fun NearPassScreen(
                         Column(
                             modifier = Modifier.weight(1f)
                         ) {
-                            Text(text = "Time: ${nearPass.time}")
+                            Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
                             Text(text = "Latitude: ${nearPass.latitude}")
                             Text(text = "Longitude: ${nearPass.longitude}")
                             Text(text = "Distance: ${nearPass.distance}")
@@ -73,7 +82,8 @@ fun NearPassScreen(
                         }) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete near pass"
+                                contentDescription = "Delete near pass",
+                                tint = Color.White
                             )
                         }
                     }
@@ -81,6 +91,11 @@ fun NearPassScreen(
             }
         }
     }
+}
+
+fun formatTimestamp(timestamp: Long): String {
+    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return dateFormat.format(Date(timestamp))
 }
 
 

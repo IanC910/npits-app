@@ -21,4 +21,7 @@ interface RideDao {
 
     @Query("UPDATE ride SET endTime = :endTime WHERE id = :rideId")
     suspend fun updateRideEndTime(rideId: Int, endTime: Long)
+
+    @Query("DELETE FROM ride")
+    suspend fun deleteAllRides()
 }

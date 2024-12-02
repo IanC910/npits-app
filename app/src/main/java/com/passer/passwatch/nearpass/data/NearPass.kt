@@ -5,25 +5,16 @@ import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import com.passer.passwatch.ride.data.Ride
 
-@Entity(
-    foreignKeys = [
-        ForeignKey(
-            entity = Ride::class,
-            parentColumns = ["id"],
-            childColumns = ["rideId"],
-            onDelete = ForeignKey.CASCADE
-        )
-    ]
-)
+@Entity
 data class NearPass(
-    val latitude: Double?,
-    val longitude: Double?,
-    val distance: Double?,
-    val speed: Double?,
-    val time: Long?,
+    var latitude: Double?,
+    var longitude: Double?,
+    var distance: Double?,
+    var speed: Double?,
+    var time: Long?,
 
-    val rideId: Int? = null,
+    var rideId: Int? = null,
 
     @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    var id: Int = 0,
 )

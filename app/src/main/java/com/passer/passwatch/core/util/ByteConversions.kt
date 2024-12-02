@@ -1,5 +1,6 @@
 package com.passer.passwatch.core.util
 
+import android.util.Log
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
@@ -40,5 +41,26 @@ fun <T> convertToBytes(value: T): ByteArray {
             value.toByteArray(Charsets.UTF_8)
         }
         else -> throw IllegalArgumentException("Unsupported type: ${value!!::class.java}")
+    }
+}
+
+/**
+ * Converts a ByteArray to a specified type.
+ */
+inline fun <reified T> convertFromBytes(bytes: ByteArray?): T? {
+    if (bytes == null) return null
+    return try {
+        when (T::class) {
+            Int::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).int as T
+            Float::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).float as T
+            Double::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).double as T
+            Long::class -> ByteBuffer.wrap(bytes).order(ByteOrder.LITTLE_ENDIAN).long as T
+            String::class -> String(bytes) as T
+            ByteArray::class -> bytes as T
+            else -> throw IllegalArgumentException("Unsupported conversion type: ${T::class}")
+        }
+    } catch (e: Exception) {
+        Log.i("BLECharacteristic", "Error converting bytes to type ${T::class}: ${e.message}")
+        null
     }
 }

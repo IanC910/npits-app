@@ -10,9 +10,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-// Reusable button function with customizable parameters
 @Composable
-fun CustomButton(
+fun WideButton(
     text: String,
     onClick: () -> Unit,
     backgroundColor: Color = Color(0xFF8A529B),

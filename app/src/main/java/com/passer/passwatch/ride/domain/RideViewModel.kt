@@ -1,17 +1,25 @@
 package com.passer.passwatch.ride.domain
 
+import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.passer.passwatch.core.ble.BluetoothGattContainer
+import com.passer.passwatch.core.ble.UUIDConstants
+import com.passer.passwatch.core.util.convertToBytes
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RideViewModel(
+    private val applicationContext: Context,
     private val rideDao: RideDao,
 ) : ViewModel() {
     private val _state = MutableStateFlow(RideState())
@@ -74,6 +82,34 @@ class RideViewModel(
                         isAddingRide = true
                     )
                 }
+            }
+
+            RideEvent.SyncRides -> {
+                if(!BluetoothGattContainer.isConnected()) {
+                    Toast.makeText(applicationContext, "Connect to a device first!", Toast.LENGTH_LONG).show()
+                    return
+                }
+
+                Toast.makeText(applicationContext, "Syncing Rides", Toast.LENGTH_SHORT).show()
+
+
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        rideDao.deleteAllRides() // Suspend until deletion is complete
+                    }
+
+                    BluetoothGattContainer.emplace(
+                        UUIDConstants.SERVICE_RIDES_LIST.uuid,
+                        UUIDConstants.RL_REQUEST.uuid,
+                        convertToBytes(1)
+                    )
+
+                    BluetoothGattContainer.flush()
+                }
+            }
+
+            RideEvent.ExportCSV -> {
+
             }
         }
     }

@@ -19,7 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.passer.passwatch.core.CustomButton
+import com.passer.passwatch.core.WideButton
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
 
@@ -36,58 +36,83 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color(0xFF282828))
     ) {
-        // Display current MAC address
-        Text("Current Hub MAC Address: ${state.hubMacAddress}", modifier = Modifier.padding(bottom = 16.dp))
-
-        // Input field for new MAC address
-        OutlinedTextField(
-            value = state.newHubMacAddress,
-            onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
-            label = { Text("Enter new Hub MAC Address") },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        )
-
-        // Custom buttons for Save, Start Scan, Stop Scan, and Live Telemetry
-        CustomButton(
-            text = "Save",
-            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) }
-        )
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+        Column(
+            horizontalAlignment = Alignment.Start,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            // Conditional Start/Stop Scan button
-            CustomButton(
-                text = if (state.scanning) "Scanning devices..." else "Scan for devices",
-                onClick = {
-                    if (state.scanning) {
-                        onEvent(SettingsEvent.StopScan)
-                    } else {
-                        onEvent(SettingsEvent.StartScan)
-                    }
-                },
-                modifier = Modifier.fillMaxWidth(0.475f)
+            Text(
+                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
             )
         }
 
-        CustomButton(
-            text = "Live Telemetry",
+        Spacer(modifier = Modifier.height(16.dp))
+
+//        OutlinedTextField(
+//            value = state.newHubMacAddress,
+//            onValueChange = { onEvent(SettingsEvent.SetMacAddress(it)) },
+//            label = { Text("Enter new Hub MAC Address") },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+//
+//        WideButton(
+//            text = "Save Manually Entered MAC Address",
+//            onClick = { onEvent(SettingsEvent.SaveMacAddress(state.newHubMacAddress)) },
+//        )
+//
+//        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
+            text = if (state.scanning) "Scanning devices..." else "Scan for devices",
             onClick = {
-                navController.navigate(
-                    com.passer.passwatch.core.TelemetryScreen(
-                        macAddress = state.hubMacAddress,
-                    )
-                )
-            },
-            modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
+                if (state.scanning) {
+                    onEvent(SettingsEvent.StopScan)
+                } else {
+                    onEvent(SettingsEvent.StartScan)
+                }
+            }
         )
 
-        // BLE devices scanning section
+        Spacer(modifier = Modifier.height(16.dp))
+
+        WideButton(
+            text = "Connect to selected device",
+            onClick = {
+                onEvent(SettingsEvent.Connect)
+            }
+        )
+        Text(
+            text = state.connectionState
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+//        WideButton(
+//            text = "Sync from Hub",
+//            onClick = {
+//                onEvent(SettingsEvent.SyncData)
+//            }
+//        )
+//        Text(
+//            text = state.syncStatus
+//        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+//        WideButton(
+//            text = "Live Telemetry",
+//            onClick = {
+//                navController.navigate(
+//                    com.passer.passwatch.core.TelemetryScreen(
+//                        macAddress = state.hubMacAddress,
+//                    )
+//                )
+//            }
+//        )
+
+//        Spacer(modifier = Modifier.height(16.dp))
+
         BleScannerResultsBox(
             state = state,
             onSelect = {

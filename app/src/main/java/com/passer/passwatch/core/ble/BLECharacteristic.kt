@@ -1,14 +1,15 @@
-package com.passer.passwatch.core.util
+package com.passer.passwatch.core.ble
 
 import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import java.util.UUID
 
-fun <T> writeToBluetoothGattCharacteristic(
+fun writeToBluetoothGattCharacteristic(
     bluetoothGatt: BluetoothGatt?,
     serviceUUID: UUID,
     characteristicUUID: UUID,
-    value: T
-) {
+    byteArray: ByteArray
+): Int {
     // Ensure that bluetoothGatt is not null
     bluetoothGatt?.let {
         // Get the service using the service UUID
@@ -19,25 +20,26 @@ fun <T> writeToBluetoothGattCharacteristic(
             val characteristic = service.getCharacteristic(characteristicUUID)
 
             if (characteristic != null) {
-                // Convert the value to a byte array
-                val byteArray = convertToBytes(value)
-
                 // Set the byte array to the characteristic
                 characteristic.value = byteArray
 
                 // Write the characteristic
-                val success = bluetoothGatt.writeCharacteristic(characteristic)
-
-                if (success) {
-                    println("Successfully wrote characteristic with UUID: $characteristicUUID")
-                } else {
-                    println("Failed to write characteristic with UUID: $characteristicUUID")
+                val result = bluetoothGatt.writeCharacteristic(characteristic, byteArray, BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT)
+                println("Write characteristic result: $result for characteristic with UUID $characteristicUUID")
+                if(result != 0) {
+                    return result
                 }
             } else {
                 println("Characteristic with UUID $characteristicUUID not found")
+                return 1
             }
         } else {
             println("Service with UUID $serviceUUID not found")
+            return 1
         }
     }
+
+    return 0
 }
+
+

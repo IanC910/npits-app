@@ -116,7 +116,7 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RideViewModel(db.rideDao) as T
+                    return RideViewModel(applicationContext, db.rideDao) as T
                 }
             }
         }
@@ -140,7 +140,7 @@ class MainActivity : ComponentActivity() {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     val bluetoothManager =
                         getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-                    return SettingsViewModel(userRepo, bluetoothManager) as T
+                    return SettingsViewModel(applicationContext, userRepo, bluetoothManager, db.nearPassDao, db.rideDao) as T
                 }
             }
         }

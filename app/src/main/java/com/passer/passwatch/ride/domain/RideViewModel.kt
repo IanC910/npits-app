@@ -10,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.util.convertToBytes
+import com.passer.passwatch.core.util.epochToUTC
 import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
@@ -147,7 +148,7 @@ class RideViewModel(
                             np.longitude,
                             np.distance,
                             np.speed,
-                            np.time,
+                            epochToUTC(np.time!! / 1000),
                             np.rideId
                         )
 

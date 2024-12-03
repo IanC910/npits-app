@@ -210,8 +210,8 @@ class SettingsViewModel(
     @SuppressLint("MissingPermission")
     private val bluetoothGattCallback = object : BluetoothGattCallback() {
 
-        private var localNearPass = NearPass(0.0,0.0,0.0,0.0,0,0)
-        private var localRide = Ride(0,0,0)
+        private var localNearPass = NearPass(0.0,0.0,0.0,0.0,0)
+        private var localRide = Ride(0,0)
 
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
             super.onConnectionStateChange(gatt, status, newState)
@@ -288,6 +288,8 @@ class SettingsViewModel(
                 }
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_NEAR_PASS_LIST.uuid, UUIDConstants.NP_VALID.uuid, convertToBytes(0))
                 BluetoothGattContainer.flush()
+
+                localNearPass = NearPass(0.0,0.0,0.0,0.0,0)
             }
 
             if(characteristic.uuid == UUIDConstants.R_VALID.uuid && convertFromBytes<Int>(value) == 1) {
@@ -299,6 +301,8 @@ class SettingsViewModel(
 
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDES_LIST.uuid, UUIDConstants.R_VALID.uuid, convertToBytes(0))
                 BluetoothGattContainer.flush()
+
+                localRide = Ride(0,0)
             }
 
             if(characteristic.uuid == UUIDConstants.RL_REQUEST.uuid && convertFromBytes<Int>(value) == 0) {

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.1"
+commonsCsv = "1.9.0"
 datastorePreferences = "1.1.1"
 javaUuidGenerator = "4.0.1"
 kotlin = "1.9.22"
@@ -25,6 +26,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commonsCsv" }
 gms-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 java-uuid-generator = { module = "com.fasterxml.uuid:java-uuid-generator", version.ref = "javaUuidGenerator" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

@@ -1,5 +1,6 @@
 [versions]
 agp = "8.5.1"
+commonsCsv = "1.9.0"
 datastorePreferences = "1.1.1"
 javaUuidGenerator = "4.0.1"
 kotlin = "1.9.22"
@@ -9,6 +10,7 @@ junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxCoroutinesCore = "1.7.3"
 kotlinxCoroutinesAndroid = "1.7.3"
+kotlinxDatetime = "0.6.1"
 activityCompose = "1.9.1"
 composeBom = "2024.06.00"
 navigationCompose = "2.8.0-beta06"
@@ -25,6 +27,7 @@ androidx-datastore-preferences = { module = "androidx.datastore:datastore-prefer
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "roomKtx" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "roomKtx" }
+commons-csv = { module = "org.apache.commons:commons-csv", version.ref = "commonsCsv" }
 gms-play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 java-uuid-generator = { module = "com.fasterxml.uuid:java-uuid-generator", version.ref = "javaUuidGenerator" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -41,6 +44,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "kotlinxCoroutinesAndroid" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutinesCore" }
+kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization"}
 play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }

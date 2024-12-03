@@ -14,4 +14,5 @@ sealed interface RideEvent {
 
     data object SyncRides : RideEvent
     data object ExportCSV : RideEvent
+    data object RequestPermissions : RideEvent
 }

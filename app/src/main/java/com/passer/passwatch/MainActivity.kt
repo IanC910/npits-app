@@ -45,6 +45,7 @@ import com.passer.passwatch.nearpass.presentation.NearPassScreen
 import com.passer.passwatch.newride.domain.NewRideEvent
 import com.passer.passwatch.newride.domain.NewRideViewModel
 import com.passer.passwatch.newride.presentation.NewRideScreen
+import com.passer.passwatch.ride.domain.RideEvent
 import com.passer.passwatch.ride.domain.RideViewModel
 import com.passer.passwatch.ride.presentation.RidesScreen
 import com.passer.passwatch.settings.domain.SettingsEvent
@@ -116,7 +117,7 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return RideViewModel(applicationContext, db.rideDao) as T
+                    return RideViewModel(applicationContext, db.rideDao, db.nearPassDao) as T
                 }
             }
         }
@@ -209,6 +210,11 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable<RidesScreen> {
+                        LaunchedEffect(key1 = "") {
+                            Log.i("MainActivity", "Requesting permissions")
+                            rideViewModel.onEvent(RideEvent.RequestPermissions)
+                        }
+
                         RidesScreen(
                             navController = navController,
                             state = rideState,

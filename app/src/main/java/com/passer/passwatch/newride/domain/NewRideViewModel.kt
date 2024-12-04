@@ -1,7 +1,6 @@
 package com.passer.passwatch.newride.domain
 
 import android.Manifest
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.location.LocationListener

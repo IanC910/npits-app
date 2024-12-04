@@ -22,8 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
-import java.util.Locale
 import com.passer.passwatch.ride.presentation.formatTimestamp
+import java.util.Locale
 
 @Composable
 fun NearPassScreen(

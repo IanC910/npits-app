@@ -1,6 +1,5 @@
 package com.passer.passwatch
 
-import android.Manifest
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager

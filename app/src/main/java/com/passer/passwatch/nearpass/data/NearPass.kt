@@ -1,9 +1,7 @@
 package com.passer.passwatch.nearpass.data
 
 import androidx.room.Entity
-import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
-import com.passer.passwatch.ride.data.Ride
 
 @Entity
 data class NearPass(

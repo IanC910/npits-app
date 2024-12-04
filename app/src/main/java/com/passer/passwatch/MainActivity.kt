@@ -238,8 +238,7 @@ class MainActivity : ComponentActivity() {
                         )
 
                         MapScreen(
-                            state = mapState,
-                            onEvent = mapViewModel::onEvent
+                            state = mapState
                         )
                     }
 

@@ -22,6 +22,7 @@ import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.repo.UserPreferencesRepository
+import com.passer.passwatch.core.util.MPS_TO_KMPH
 import com.passer.passwatch.core.util.convertFromBytes
 import com.passer.passwatch.core.util.convertToBytes
 import com.passer.passwatch.nearpass.data.NearPass
@@ -350,7 +351,7 @@ class SettingsViewModel(
                     localNearPass.longitude = convertFromBytes<Double>(value)
                 }
                 UUIDConstants.NP_SPEED_MPS.uuid -> {
-                    localNearPass.speed = convertFromBytes<Double>(value)
+                    localNearPass.speed = convertFromBytes<Double>(value)?.times(MPS_TO_KMPH)
                 }
                 UUIDConstants.NP_DISTANCE_CM.uuid -> {
                     localNearPass.distance = convertFromBytes<Int>(value)?.toDouble()

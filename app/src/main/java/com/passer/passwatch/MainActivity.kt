@@ -324,10 +324,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestPermissions() {
-        requestPermission(Manifest.permission.BLUETOOTH)
-        requestPermission(Manifest.permission.BLUETOOTH_SCAN)
-        requestPermission(Manifest.permission.BLUETOOTH_ADMIN)
-        requestPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    }
 }

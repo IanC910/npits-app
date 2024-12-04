@@ -30,6 +30,7 @@ import com.passer.passwatch.nearpass.data.NearPassDao
 import com.passer.passwatch.ride.data.Ride
 import com.passer.passwatch.ride.data.RideDao
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -139,14 +140,26 @@ class SettingsViewModel(
                     return
                 }
 
-                _state.update {
-                    it.copy(connectionState = "Connecting...")
-                }
                 Log.i("SettingsViewModel", "Connecting to device: ${hubMacAddress.value}")
                 bluetoothManager.adapter?.let { adapter ->
                     try {
-                        val device = adapter.getRemoteDevice(hubMacAddress.value)
-                        BluetoothGattContainer.gatt = device.connectGatt(applicationContext, true, bluetoothGattCallback)
+                        viewModelScope.launch {
+                            if(BluetoothGattContainer.isConnected()){
+                                _state.update {
+                                    it.copy(connectionState = "Resetting Connection...")
+                                }
+
+                                BluetoothGattContainer.disconnect()
+                                delay(2000)
+                            }
+
+                            _state.update {
+                                it.copy(connectionState = "Connecting...")
+                            }
+
+                            val device = adapter.getRemoteDevice(hubMacAddress.value)
+                            BluetoothGattContainer.gatt = device.connectGatt(applicationContext, true, bluetoothGattCallback)
+                        }
 
                     } catch (exception: IllegalArgumentException) {
                         Log.w(
@@ -262,6 +275,7 @@ class SettingsViewModel(
             BluetoothGattContainer.removeLastDescriptor()
 
             if(BluetoothGattContainer.isDescriptorQueueEmpty()){
+                Log.i("SettingsViewModel", "Descriptor queue is empty")
                 _state.update {
                     it.copy(connectionState = "Connected!")
                 }

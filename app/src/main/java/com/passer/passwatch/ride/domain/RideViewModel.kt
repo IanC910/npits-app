@@ -139,7 +139,7 @@ class RideViewModel(
                 Log.i("RideViewModel", "File path: $filePath")
 
                 val writer: BufferedWriter = Files.newBufferedWriter(Paths.get(filePath))
-                val csvPrinter = CSVPrinter(writer, CSVFormat.Builder.create().setHeader("Latitude", "Longitude", "Distance", "Speed", "Time", "Ride ID").build())
+                val csvPrinter = CSVPrinter(writer, CSVFormat.Builder.create().setHeader("Latitude", "Longitude", "Distance (cm)", "Speed (km/h)", "Time (UTC)", "Ride ID").build())
 
                 viewModelScope.launch {
                     nearPassDao.allNearPasses().forEach{ np ->

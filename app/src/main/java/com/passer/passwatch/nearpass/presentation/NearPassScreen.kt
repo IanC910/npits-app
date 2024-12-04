@@ -74,8 +74,8 @@ fun NearPassScreen(
                             Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
                             Text(text = "Latitude: ${nearPass.latitude}")
                             Text(text = "Longitude: ${nearPass.longitude}")
-                            Text(text = "Distance: ${nearPass.distance}")
-                            Text(text = "Speed: ${nearPass.speed}")
+                            Text(text = "Distance: ${nearPass.distance} cm")
+                            Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
                         }
                         IconButton(onClick = {
                             onEvent(NearPassEvent.DeleteNearPass(nearPass))

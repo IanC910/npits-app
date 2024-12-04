@@ -49,7 +49,7 @@ fun NewRideScreen(
 
         if(state.rideStatus) {
             Text(
-                text = "You are on Ride ${state.rideId}",
+                text = "You are currently on a Ride",
                 color = Color.White,
                 fontSize = 18.sp
             )

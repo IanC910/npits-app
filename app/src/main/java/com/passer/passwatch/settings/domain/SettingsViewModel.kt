@@ -337,8 +337,6 @@ class SettingsViewModel(
             super.onCharacteristicChanged(gatt, characteristic, value)
 
             Log.i("SettingsViewModel", "Characteristic " + characteristic.uuid.toString() + " changed: " + value.contentToString())
-            Log.i("TEST", "${convertFromBytes<Int>(value) == 1}")
-
 
             if(characteristic.uuid == UUIDConstants.NP_VALID.uuid && convertFromBytes<Int>(value) == 1) {
                 Log.i("SettingsViewModel", "Logging Near Pass to DB")

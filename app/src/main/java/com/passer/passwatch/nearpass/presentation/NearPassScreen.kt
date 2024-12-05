@@ -10,9 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -24,26 +22,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.passer.passwatch.nearpass.domain.NearPassEvent
 import com.passer.passwatch.nearpass.domain.NearPassState
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 import com.passer.passwatch.ride.presentation.formatTimestamp
+import java.util.Locale
 
 @Composable
 fun NearPassScreen(
     state: NearPassState,
     onEvent: (NearPassEvent) -> Unit,
 ) {
-    Scaffold(floatingActionButton = {
-        FloatingActionButton(onClick = {
-            onEvent(NearPassEvent.ShowDialog)
-        }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add near pass",
-            )
-        }
-    }) { padding ->
+    Scaffold { padding ->
 
         if (state.isAddingNearPass) {
             AddNearPassDialog(state = state, onEvent = onEvent)
@@ -64,38 +51,43 @@ fun NearPassScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                items(state.nearPasses) { nearPass ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
-                            Text(text = "Latitude: ${nearPass.latitude}")
-                            Text(text = "Longitude: ${nearPass.longitude}")
-                            Text(text = "Distance: ${nearPass.distance} cm")
-                            Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
+                if(state.nearPasses.isEmpty()){
+                    item {
+                        Row(horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ){
+                            Text(text = "No Near Passes to display for Ride ${state.rideId}")
                         }
-                        IconButton(onClick = {
-                            onEvent(NearPassEvent.DeleteNearPass(nearPass))
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete near pass",
-                                tint = Color.White
-                            )
+                    }
+                }else{
+                    items(state.nearPasses) { nearPass ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
+                                Text(text = "Latitude: ${nearPass.latitude}")
+                                Text(text = "Longitude: ${nearPass.longitude}")
+                                Text(text = "Distance: ${nearPass.distance} cm")
+                                Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
+                            }
+    //                        IconButton(onClick = {
+    //                            onEvent(NearPassEvent.DeleteNearPass(nearPass))
+    //                        }) {
+    //                            Icon(
+    //                                imageVector = Icons.Default.Delete,
+    //                                contentDescription = "Delete near pass",
+    //                                tint = Color.White
+    //                            )
+    //                        }
                         }
                     }
                 }
             }
         }
     }
-}
-
-fun formatTimestamp(timestamp: Long): String {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-    return dateFormat.format(Date(timestamp))
 }
 
 

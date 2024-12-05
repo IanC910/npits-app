@@ -1,6 +1,5 @@
 package com.passer.passwatch
 
-import android.Manifest
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -85,14 +84,9 @@ class MainActivity : ComponentActivity() {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     val locationManager =
                         getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                    val bluetoothManager =
-                        getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                     return NewRideViewModel(
-                        applicationContext,
-                        userRepo,
                         locationManager,
-                        bluetoothManager,
-                        db.rideDao,
                         db.routeDao,
                         db.nearPassDao
                     ) as T
@@ -164,8 +158,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userRepo = UserPreferencesRepository(dataStore)
-
-//        requestPermissions()
 
         setContent {
             lifecycleScope.launch {
@@ -249,7 +241,6 @@ class MainActivity : ComponentActivity() {
                         }
 
                         SettingsScreen(
-                            navController = navController,
                             state = settingsState,
                             onEvent = settingsViewModel::onEvent
                         )
@@ -324,10 +315,4 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun requestPermissions() {
-        requestPermission(Manifest.permission.BLUETOOTH)
-        requestPermission(Manifest.permission.BLUETOOTH_SCAN)
-        requestPermission(Manifest.permission.BLUETOOTH_ADMIN)
-        requestPermission(Manifest.permission.BLUETOOTH_CONNECT)
-    }
 }

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.passer.passwatch.core.repo.data.RouteDao
 import com.passer.passwatch.nearpass.data.NearPassDao
-import com.passer.passwatch.newride.domain.NewRideState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted

@@ -5,11 +5,18 @@ import android.bluetooth.BluetoothDevice
 import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -18,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.passer.passwatch.core.WideButton
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
@@ -27,7 +33,6 @@ import com.passer.passwatch.settings.domain.SettingsState
 fun SettingsScreen(
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
-    navController: NavHostController,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,
@@ -36,16 +41,16 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color(0xFF282828))
     ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+//        Column(
+//            horizontalAlignment = Alignment.Start,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text(
+//                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
 
 //        OutlinedTextField(
 //            value = state.newHubMacAddress,
@@ -143,7 +148,7 @@ fun BleScannerResultsBox(
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(state.scannedDevices) { device ->
-            BluetoothDeviceItem(bluetoothDevice = device, onSelect = onSelect)
+            BluetoothDeviceItem(hubMacAddress = state.hubMacAddress, bluetoothDevice = device, onSelect = onSelect)
         }
     }
 }
@@ -151,6 +156,7 @@ fun BleScannerResultsBox(
 @SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDeviceItem(
+    hubMacAddress: String,
     bluetoothDevice: BluetoothDevice,
     onSelect: (BluetoothDevice) -> Unit,
 ) {
@@ -168,12 +174,9 @@ fun BluetoothDeviceItem(
             )
             Text(text = bluetoothDevice.address)
         }
-        Text(
-            when (bluetoothDevice.bondState) {
-                BluetoothDevice.BOND_BONDED -> "Paired"
-                BluetoothDevice.BOND_BONDING -> "Pairing"
-                else -> "Not Paired"
-            }
-        )
+
+        if (bluetoothDevice.address == hubMacAddress) {
+            Text("Selected")
+        }
     }
 }

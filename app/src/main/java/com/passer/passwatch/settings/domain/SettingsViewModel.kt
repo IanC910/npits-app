@@ -426,6 +426,14 @@ class SettingsViewModel(
                 UUIDConstants.R_END_TIME.uuid -> {
                     localRide.endTime = convertFromBytes<Long>(value)?.times(1000)
                 }
+
+                UUIDConstants.GOPRO_STATUS.uuid -> {
+                    val goProStatus = convertFromBytes<Int>(value)!!
+                    _state.update {
+                        it.copy(goProConnectedToWiFi = (goProStatus == 1))
+                    }
+                }
+
             }
         }
 

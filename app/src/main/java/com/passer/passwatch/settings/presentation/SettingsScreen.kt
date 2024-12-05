@@ -82,6 +82,17 @@ fun SettingsScreen(
             label = { Text("Enter GoPro WiFi Password") },
             modifier = Modifier.fillMaxWidth()
         )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = if(state.goProConnectedToWiFi){
+                "Hub Connected to GoPro WiFi"
+            }else{
+                "Hub Disconnected to GoPro WiFi"
+            },
+            modifier = Modifier.fillMaxWidth(),
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
 

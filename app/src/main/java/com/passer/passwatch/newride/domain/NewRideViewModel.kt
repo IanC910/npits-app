@@ -77,7 +77,6 @@ class NewRideViewModel(
                 if (!BluetoothGattContainer.isConnected()) {
                     _state.update {
                         it.copy(
-                            rideStatus = false,
                             rideStatusMessage = "Connect to an NPITS device first!"
                         )
                     }
@@ -85,7 +84,6 @@ class NewRideViewModel(
                 }
                 _state.update {
                     it.copy(
-                        rideStatus = true,
                         rideStatusMessage = "Ride Started!"
                     )
                 }
@@ -120,8 +118,8 @@ class NewRideViewModel(
                 )
 
                 viewModelScope.launch {
-                    val newRideId =
-                        rideDao.insertRide(ride)
+//                    val newRideId =
+//                        rideDao.insertRide(ride)
 
 
                     // Initialize values
@@ -130,7 +128,7 @@ class NewRideViewModel(
                             rideStarted = true,
                             rideStartTime = System.currentTimeMillis(),
                             rideTime = 0,
-                            rideId = newRideId.toInt()
+//                            rideId = newRideId.toInt()
                         )
                     }
                 }
@@ -143,13 +141,14 @@ class NewRideViewModel(
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(0))
                 BluetoothGattContainer.flush()
 
-                viewModelScope.launch {
-                    rideDao.updateRideEndTime(state.value.rideId, System.currentTimeMillis())
-                }
+//                viewModelScope.launch {
+//                    rideDao.updateRideEndTime(state.value.rideId, System.currentTimeMillis())
+//                }
 
                 _state.update {
                     it.copy(
-                        rideStarted = false
+                        rideStarted = false,
+                        rideStatusMessage = "Ride Ended"
                     )
                 }
             }

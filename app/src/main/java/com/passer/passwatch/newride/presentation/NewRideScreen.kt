@@ -52,7 +52,7 @@ fun NewRideScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        if(state.rideStatus) {
+        if(state.rideStarted) {
             Text(
                 text = "You are currently on a Ride",
                 color = Color.White,

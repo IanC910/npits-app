@@ -112,6 +112,15 @@ class NewRideViewModel(
                 timerJob?.cancel()
                 locationManager.removeUpdates(locationListener)
 
+                if(!BluetoothGattContainer.isConnected()){
+                    _state.update {
+                        it.copy(
+                            rideStatusMessage = "Connect to an NPITS device before stopping the ride!"
+                        )
+                    }
+                    return
+                }
+
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(0))
                 BluetoothGattContainer.flush()
 

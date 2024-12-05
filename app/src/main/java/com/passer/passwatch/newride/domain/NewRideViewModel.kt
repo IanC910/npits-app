@@ -2,12 +2,15 @@ package com.passer.passwatch.newride.domain
 
 import android.Manifest
 import android.location.LocationListener
-import android.location.LocationManager
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
 import com.passer.passwatch.core.ble.BluetoothGattContainer
 import com.passer.passwatch.core.ble.UUIDConstants
 import com.passer.passwatch.core.repo.data.RouteDao
@@ -28,7 +31,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class NewRideViewModel(
-    private val locationManager: LocationManager,
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val routeDao: RouteDao,
     private val nearPassDao: NearPassDao,
 ) : ViewModel() {
@@ -94,12 +97,14 @@ class NewRideViewModel(
                     }
                 }
 
-                locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    10000,
-                    0.0001f,
-                    locationListener
-                )
+
+                val locationRequest = LocationRequest.create().apply {
+                    interval = 5000 // 10 seconds interval
+                    fastestInterval = 2000 // 5 seconds fastest interval
+                    priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+                }
+
+                fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, null)
 
                 viewModelScope.launch {
 
@@ -116,7 +121,7 @@ class NewRideViewModel(
 
             is NewRideEvent.StopRide -> {
                 timerJob?.cancel()
-                locationManager.removeUpdates(locationListener)
+                fusedLocationProviderClient.removeLocationUpdates(locationCallback)
 
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(0))
                 BluetoothGattContainer.flush()
@@ -177,6 +182,49 @@ class NewRideViewModel(
             }
         }else{
             Log.i("NewRideViewModel", "No GATT connection, cannot update location")
+        }
+    }
+
+    private val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            super.onLocationResult(locationResult)
+
+            if(locationResult.locations.isEmpty()){
+                return
+            }
+
+            val location = locationResult.locations.last()
+            Log.i("NewRideViewModel", "Location changed: $location")
+
+            if (BluetoothGattContainer.isConnected()) {
+                Log.i("NewRideViewModel", "Sending location to device: $location")
+
+                viewModelScope.launch {
+                    BluetoothGattContainer.clear()
+
+                    BluetoothGattContainer.emplace(
+                        UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                        UUIDConstants.GPS_LATITUDE.uuid,
+                        convertToBytes(location.latitude)
+                    )
+
+                    BluetoothGattContainer.emplace(
+                        UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                        UUIDConstants.GPS_LONGITUDE.uuid,
+                        convertToBytes(location.longitude)
+                    )
+
+                    BluetoothGattContainer.emplace(
+                        UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                        UUIDConstants.GPS_SPEED_MPS.uuid,
+                        convertToBytes(location.speed.toInt())
+                    )
+
+                    BluetoothGattContainer.flush()
+                }
+            }else{
+                Log.i("NewRideViewModel", "No GATT connection, cannot update location")
+            }
         }
     }
 }

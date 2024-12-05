@@ -68,8 +68,8 @@ fun NearPassScreen(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
-                                Text(text = "Latitude: ${nearPass.latitude}")
-                                Text(text = "Longitude: ${nearPass.longitude}")
+                                Text(text = "Latitude: ${String.format(Locale.getDefault(), "%.10f", nearPass.latitude)}")
+                                Text(text = "Longitude: ${String.format(Locale.getDefault(), "%.10f", nearPass.longitude)}")
                                 Text(text = "Distance: ${nearPass.distance} cm")
                                 Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
                             }

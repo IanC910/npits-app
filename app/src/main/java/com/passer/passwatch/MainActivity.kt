@@ -244,6 +244,11 @@ class MainActivity : ComponentActivity() {
                             state = settingsState,
                             onEvent = settingsViewModel::onEvent
                         )
+
+                        LaunchedEffect(key1 = "") {
+                            Log.i("MainActivity", "Load GoPro creds")
+                            settingsViewModel.onEvent(SettingsEvent.LoadGoProCredentials)
+                        }
                     }
 
                     composable<TelemetryScreen> {

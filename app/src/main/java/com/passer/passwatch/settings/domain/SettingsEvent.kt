@@ -11,4 +11,8 @@ sealed interface SettingsEvent {
 
     data object Connect : SettingsEvent
     data object SyncData : SettingsEvent
+
+    data object LoadGoProCredentials : SettingsEvent
+    data class SetGoProWiFi(val newGoProWiFi: String) : SettingsEvent
+    data class SetGoProPassword(val newGoProPassword: String) : SettingsEvent
 }

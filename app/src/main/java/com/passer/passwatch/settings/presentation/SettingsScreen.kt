@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -67,6 +68,22 @@ fun SettingsScreen(
 //        )
 //
 //        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = state.newGoProWiFi,
+            onValueChange = { onEvent(SettingsEvent.SetGoProWiFi(it)) },
+            label = { Text("Enter GoPro WiFi SSID") },
+            modifier = Modifier.fillMaxWidth(),
+        )
+
+        OutlinedTextField(
+            value = state.newGoProWiFiPassword,
+            onValueChange = { onEvent(SettingsEvent.SetGoProPassword(it)) },
+            label = { Text("Enter GoPro WiFi Password") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         WideButton(
             text = if (state.scanning) "Scanning devices..." else "Scan for devices",

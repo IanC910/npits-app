@@ -89,6 +89,11 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.StartScan -> {
+                if(!bluetoothManager.adapter.isEnabled){
+                    Toast.makeText(applicationContext, "Enable Bluetooth First!", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
                 viewModelScope.launch {
                     _permissionNeeded.emit(Manifest.permission.BLUETOOTH_CONNECT)
                     val scanSettings: ScanSettings = ScanSettings.Builder()
@@ -131,6 +136,11 @@ class SettingsViewModel(
             }
 
             is SettingsEvent.Connect -> {
+                if(!bluetoothManager.adapter.isEnabled){
+                    Toast.makeText(applicationContext, "Enable Bluetooth First!", Toast.LENGTH_SHORT).show()
+                    return
+                }
+
                 if(hubMacAddress.value == "") {
                     _state.update {
                         it.copy(connectionState = "Select a device first!")

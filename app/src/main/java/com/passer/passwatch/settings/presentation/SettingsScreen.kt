@@ -41,16 +41,16 @@ fun SettingsScreen(
             .fillMaxSize()
             .background(Color(0xFF282828))
     ) {
-        Column(
-            horizontalAlignment = Alignment.Start,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
+//        Column(
+//            horizontalAlignment = Alignment.Start,
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text(
+//                text = "Selected Hub MAC Address: ${state.hubMacAddress}"
+//            )
+//        }
+//
+//        Spacer(modifier = Modifier.height(16.dp))
 
 //        OutlinedTextField(
 //            value = state.newHubMacAddress,
@@ -148,7 +148,7 @@ fun BleScannerResultsBox(
 
     LazyColumn(modifier = Modifier.fillMaxWidth()) {
         items(state.scannedDevices) { device ->
-            BluetoothDeviceItem(bluetoothDevice = device, onSelect = onSelect)
+            BluetoothDeviceItem(hubMacAddress = state.hubMacAddress, bluetoothDevice = device, onSelect = onSelect)
         }
     }
 }
@@ -156,6 +156,7 @@ fun BleScannerResultsBox(
 @SuppressLint("MissingPermission")
 @Composable
 fun BluetoothDeviceItem(
+    hubMacAddress: String,
     bluetoothDevice: BluetoothDevice,
     onSelect: (BluetoothDevice) -> Unit,
 ) {
@@ -173,12 +174,9 @@ fun BluetoothDeviceItem(
             )
             Text(text = bluetoothDevice.address)
         }
-        Text(
-            when (bluetoothDevice.bondState) {
-                BluetoothDevice.BOND_BONDED -> "Paired"
-                BluetoothDevice.BOND_BONDING -> "Pairing"
-                else -> "Not Paired"
-            }
-        )
+
+        if (bluetoothDevice.address == hubMacAddress) {
+            Text("Selected")
+        }
     }
 }

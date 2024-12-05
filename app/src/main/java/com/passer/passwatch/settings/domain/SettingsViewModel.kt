@@ -54,16 +54,26 @@ class SettingsViewModel(
 
     private val _state = MutableStateFlow(SettingsState())
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
+    private val _goProWiFi = userPreferencesRepository.goProWiFi
+    private val _goProWiFiPassword = userPreferencesRepository.goProPassword
     private val _permissionNeeded = MutableSharedFlow<String>()
 
     val state = combine(_state, _hubMacAddress) { state, hubMacAddress ->
         state.copy(
-            hubMacAddress = hubMacAddress
+            hubMacAddress = hubMacAddress,
         )
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), SettingsState())
     val permissionNeeded = _permissionNeeded.asSharedFlow()
 
     private val hubMacAddress = _hubMacAddress.stateIn(
+        viewModelScope, SharingStarted.Eagerly, ""
+    )
+
+    private val goProWiFi = _goProWiFi.stateIn(
+        viewModelScope, SharingStarted.Eagerly, ""
+    )
+
+    private val goProWiFiPassword = _goProWiFiPassword.stateIn(
         viewModelScope, SharingStarted.Eagerly, ""
     )
 
@@ -208,6 +218,33 @@ class SettingsViewModel(
 //                    BluetoothGattContainer.flush()
 //                }
             }
+
+            is SettingsEvent.SetGoProPassword -> {
+                _state.update {
+                    it.copy(newGoProWiFiPassword = event.newGoProPassword)
+                }
+                viewModelScope.launch {
+                    userPreferencesRepository.saveGoProPassword(event.newGoProPassword)
+                }
+            }
+
+            is SettingsEvent.SetGoProWiFi -> {
+                _state.update {
+                    it.copy(newGoProWiFi = event.newGoProWiFi)
+                }
+                viewModelScope.launch {
+                    userPreferencesRepository.saveGoProWiFi(event.newGoProWiFi)
+                }
+            }
+
+            SettingsEvent.LoadGoProCredentials -> {
+                _state.update {
+                    it.copy(
+                        newGoProWiFi = goProWiFi.value,
+                        newGoProWiFiPassword = goProWiFiPassword.value
+                    )
+                }
+            }
         }
     }
 
@@ -300,8 +337,6 @@ class SettingsViewModel(
             super.onCharacteristicChanged(gatt, characteristic, value)
 
             Log.i("SettingsViewModel", "Characteristic " + characteristic.uuid.toString() + " changed: " + value.contentToString())
-            Log.i("TEST", "${convertFromBytes<Int>(value) == 1}")
-
 
             if(characteristic.uuid == UUIDConstants.NP_VALID.uuid && convertFromBytes<Int>(value) == 1) {
                 Log.i("SettingsViewModel", "Logging Near Pass to DB")
@@ -389,6 +424,14 @@ class SettingsViewModel(
                 UUIDConstants.R_END_TIME.uuid -> {
                     localRide.endTime = convertFromBytes<Long>(value)?.times(1000)
                 }
+
+                UUIDConstants.GOPRO_STATUS.uuid -> {
+                    val goProStatus = convertFromBytes<Int>(value)!!
+                    _state.update {
+                        it.copy(goProConnectedToWiFi = (goProStatus == 1))
+                    }
+                }
+
             }
         }
 

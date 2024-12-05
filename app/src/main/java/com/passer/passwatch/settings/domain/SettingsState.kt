@@ -9,4 +9,10 @@ data class SettingsState (
     val scannedDevices : List<BluetoothDevice> = emptyList(),
     val connectionState : String = "Not Connected",
     val syncStatus : String = "Not Synced",
+    val goProConnectedToWiFi : Boolean = false,
+
+    val goProWiFi : String = "",
+    val newGoProWiFi : String = "",
+    val goProWiFiPassword : String = "",
+    val newGoProWiFiPassword : String = "",
 )

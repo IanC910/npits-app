@@ -3,7 +3,7 @@ package com.passer.passwatch
 import android.bluetooth.BluetoothManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.location.LocationManager
+import com.google.android.gms.location.LocationServices
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -82,11 +82,9 @@ class MainActivity : ComponentActivity() {
         factoryProducer = {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    val locationManager =
-                        getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                    getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    val fusedLocationClient = LocationServices.getFusedLocationProviderClient(this@MainActivity)
                     return NewRideViewModel(
-                        locationManager,
+                        fusedLocationClient,
                         db.routeDao,
                         db.nearPassDao
                     ) as T

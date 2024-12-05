@@ -21,6 +21,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -93,51 +94,61 @@ fun RidesScreen(
                 }
             }
 
-            items(state.rides) { ride ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
+            if(state.rides.isEmpty()){
+                item {
+                    Row(horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ){
+                        Text(text = "No Rides to display")
+                    }
+                }
+            }else{
+                items(state.rides) { ride ->
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
-                        Text(text = "Ride #${ride.id}", fontSize = 20.sp, color = Color.White)
-                        Text(text = "Start Time: ${ride.startTime?.let { formatTimestamp(it) }}", color = Color.White)
-                        Text(text = "End Time: ${ride.endTime?.let { formatTimestamp(it) }}", color = Color.White)
-                    }
-                    IconButton(onClick = {
-                        navController.navigate(
-                            MapScreen(
-                                rideId = ride.id
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            Text(text = "Ride #${ride.id}", fontSize = 20.sp, color = Color.White)
+                            Text(text = "Start Time: ${ride.startTime?.let { formatTimestamp(it) }}", color = Color.White)
+                            Text(text = "End Time: ${ride.endTime?.let { formatTimestamp(it) }}", color = Color.White)
+                        }
+                        IconButton(onClick = {
+                            navController.navigate(
+                                MapScreen(
+                                    rideId = ride.id
+                                )
                             )
-                        )
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.LocationOn,
-                            contentDescription = "View Map",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = {
-                        navController.navigate(
-                            NearPassScreen(
-                                rideId = ride.id
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.LocationOn,
+                                contentDescription = "View Map",
+                                tint = Color.White
                             )
-                        )
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "View Near Passes",
-                            tint = Color.White
-                        )
-                    }
-                    IconButton(onClick = {
-                        onEvent(RideEvent.DeleteRide(ride))
-                    }) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Delete ride",
-                            tint = Color.White
-                        )
+                        }
+                        IconButton(onClick = {
+                            navController.navigate(
+                                NearPassScreen(
+                                    rideId = ride.id
+                                )
+                            )
+                        }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = "View Near Passes",
+                                tint = Color.White
+                            )
+                        }
+//                    IconButton(onClick = {
+//                        onEvent(RideEvent.DeleteRide(ride))
+//                    }) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Delete ride",
+//                            tint = Color.White
+//                        )
+//                    }
                     }
                 }
             }

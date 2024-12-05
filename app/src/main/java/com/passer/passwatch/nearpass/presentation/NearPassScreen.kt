@@ -51,27 +51,37 @@ fun NearPassScreen(
                 modifier = Modifier.fillMaxSize(),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                items(state.nearPasses) { nearPass ->
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
-                            Text(text = "Latitude: ${nearPass.latitude}")
-                            Text(text = "Longitude: ${nearPass.longitude}")
-                            Text(text = "Distance: ${nearPass.distance} cm")
-                            Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
+                if(state.nearPasses.isEmpty()){
+                    item {
+                        Row(horizontalArrangement = Arrangement.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        ){
+                            Text(text = "No Near Passes to display for Ride ${state.rideId}")
                         }
-                        IconButton(onClick = {
-                            onEvent(NearPassEvent.DeleteNearPass(nearPass))
-                        }) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete near pass",
-                                tint = Color.White
-                            )
+                    }
+                }else{
+                    items(state.nearPasses) { nearPass ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                        ) {
+                            Column(
+                                modifier = Modifier.weight(1f)
+                            ) {
+                                Text(text = "Time: ${nearPass.time?.let {formatTimestamp(it)}}")
+                                Text(text = "Latitude: ${nearPass.latitude}")
+                                Text(text = "Longitude: ${nearPass.longitude}")
+                                Text(text = "Distance: ${nearPass.distance} cm")
+                                Text(text = "Speed: ${String.format(Locale.getDefault(), "%.2f", nearPass.speed)} km/h")
+                            }
+    //                        IconButton(onClick = {
+    //                            onEvent(NearPassEvent.DeleteNearPass(nearPass))
+    //                        }) {
+    //                            Icon(
+    //                                imageVector = Icons.Default.Delete,
+    //                                contentDescription = "Delete near pass",
+    //                                tint = Color.White
+    //                            )
+    //                        }
                         }
                     }
                 }

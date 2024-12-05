@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
 import com.passer.passwatch.core.WideButton
 import com.passer.passwatch.settings.domain.SettingsEvent
 import com.passer.passwatch.settings.domain.SettingsState
@@ -34,7 +33,6 @@ import com.passer.passwatch.settings.domain.SettingsState
 fun SettingsScreen(
     state: SettingsState,
     onEvent: (SettingsEvent) -> Unit,
-    navController: NavHostController,
 ) {
     Column(
         verticalArrangement = Arrangement.Center,

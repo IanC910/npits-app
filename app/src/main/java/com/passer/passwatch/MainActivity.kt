@@ -84,14 +84,9 @@ class MainActivity : ComponentActivity() {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
                     val locationManager =
                         getSystemService(Context.LOCATION_SERVICE) as LocationManager
-                    val bluetoothManager =
-                        getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+                    getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
                     return NewRideViewModel(
-                        applicationContext,
-                        userRepo,
                         locationManager,
-                        bluetoothManager,
-                        db.rideDao,
                         db.routeDao,
                         db.nearPassDao
                     ) as T
@@ -163,8 +158,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         userRepo = UserPreferencesRepository(dataStore)
-
-//        requestPermissions()
 
         setContent {
             lifecycleScope.launch {
@@ -248,7 +241,6 @@ class MainActivity : ComponentActivity() {
                         }
 
                         SettingsScreen(
-                            navController = navController,
                             state = settingsState,
                             onEvent = settingsViewModel::onEvent
                         )

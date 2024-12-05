@@ -40,19 +40,7 @@ fun RidesScreen(
     state: RideState,
     onEvent: (RideEvent) -> Unit,
 ) {
-    Scaffold(
-//        floatingActionButton = {
-//            FloatingActionButton(
-//                onClick = {
-//                    onEvent(RideEvent.ShowDialog)
-//                }) {
-//                Icon(
-//                    imageVector = Icons.Default.Add,
-//                    contentDescription = "Add ride",
-//                )
-//            }
-//        }
-    ) { padding ->
+    Scaffold { padding ->
 
         if (state.isAddingRide) {
             AddRideDialog(state = state, onEvent = onEvent)

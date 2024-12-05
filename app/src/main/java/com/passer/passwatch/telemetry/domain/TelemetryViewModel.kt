@@ -135,7 +135,7 @@ class TelemetryViewModel(
 
                     }
                 }
-                return;
+                return
             }
 
             val characteristic: BluetoothGattCharacteristic = characteristics.last()

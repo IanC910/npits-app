@@ -30,16 +30,7 @@ fun NearPassScreen(
     state: NearPassState,
     onEvent: (NearPassEvent) -> Unit,
 ) {
-    Scaffold(/*floatingActionButton = {
-        FloatingActionButton(onClick = {
-            onEvent(NearPassEvent.ShowDialog)
-        }) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = "Add near pass",
-            )
-        }
-    }*/) { padding ->
+    Scaffold { padding ->
 
         if (state.isAddingNearPass) {
             AddNearPassDialog(state = state, onEvent = onEvent)

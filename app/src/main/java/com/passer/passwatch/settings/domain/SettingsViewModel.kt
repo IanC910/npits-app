@@ -56,8 +56,6 @@ class SettingsViewModel(
     private val _hubMacAddress = userPreferencesRepository.hubMacAddress
     private val _permissionNeeded = MutableSharedFlow<String>()
 
-    private var bluetoothGatt: BluetoothGatt? = null
-
     val state = combine(_state, _hubMacAddress) { state, hubMacAddress ->
         state.copy(
             hubMacAddress = hubMacAddress

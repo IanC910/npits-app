@@ -72,6 +72,12 @@ class NewRideViewModel(
                     )
                 }
 
+                BluetoothGattContainer.emplace(
+                    UUIDConstants.SERVICE_GPS_COORDS.uuid,
+                    UUIDConstants.GPS_TIME.uuid,
+                    convertToBytes(System.currentTimeMillis().div(1000))
+                )
+
                 BluetoothGattContainer.emplace(UUIDConstants.SERVICE_RIDE_CONTROL.uuid, UUIDConstants.RC_CMD.uuid, convertToBytes(1))
                 BluetoothGattContainer.flush()
 
@@ -165,12 +171,6 @@ class NewRideViewModel(
                     UUIDConstants.SERVICE_GPS_COORDS.uuid,
                     UUIDConstants.GPS_SPEED_MPS.uuid,
                     convertToBytes(location.speed.toInt())
-                )
-
-                BluetoothGattContainer.emplace(
-                    UUIDConstants.SERVICE_GPS_COORDS.uuid,
-                    UUIDConstants.GPS_TIME.uuid,
-                    convertToBytes(System.currentTimeMillis().div(1000))
                 )
 
                 BluetoothGattContainer.flush()
